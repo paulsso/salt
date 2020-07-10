@@ -1,0 +1,464 @@
+import time
+import numpy as np
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import axes3d, Axes3D
+from oct2py import Oct2Py
+
+def CreateArray(properties):
+    transducer_radius = properties["TransRadius"]
+    transducer_per_layer = properties["Depth"]
+    layers = properties["Layers"]
+    socket_radius = properties["Radius"]
+    r_c = properties["RadiusCurvature"]
+    h = properties["Displacement"]
+    s = properties["Orientation"]
+
+    tz0 = s*(h - r_c)
+
+    X, Y = np.mgrid[-socket_radius*1e3:socket_radius*1e3,-socket_radius*1e3:socket_radius*1e3]
+    X = X*1e-3
+    Y = Y*1e-3
+    r = np.array([24, 46, 68, 90, 112, 135, 158, 180])*1e-3
+    Vx = []
+    Vy = []
+
+    for kk in range(layers):
+        n = transducer_per_layer[kk]
+        beta = np.linspace(2*np.pi/n, 2*np.pi, n)
+
+        for ii in range(transducer_per_layer[kk]):
+            C = np.sqrt((X - 0.5*r[kk]*np.cos(beta[ii]))**2 + (Y - 0.5*r[kk]*np.sin(beta[ii]))**2) <= transducer_radius
+            vec1 = X[C]
+            vec2 = Y[C]
+            Vx = np.append(Vx, vec1)
+            Vy = np.append(Vy, vec2)
+
+        Vz = tz0 + s*np.sqrt(r_c**2 - np.power(Vx,2) - np.power(Vy,2))
+
+    Vx = Vx.reshape([len(Vx),1])
+    Vy = Vy.reshape([len(Vy),1])
+    Vz = Vz.reshape([len(Vz),1])
+    S = Vx + Vz + Vy
+
+    if np.isnan(S).any():
+        Vx = np.delete(Vx,np.argwhere(np.isnan(S)))
+        Vy = np.delete(Vy,np.argwhere(np.isnan(S)))
+        Vz = np.delete(Vz,np.argwhere(np.isnan(S)))
+    Vx = Vx.reshape([len(Vx),1])
+    Vy = Vy.reshape([len(Vy),1])
+    Vz = Vz.reshape([len(Vz),1])
+
+    return Vx, Vy, Vz
+
+def CreateReflector(properties):
+
+    R = properties["Radius"]*1e3
+    r_c = properties["RadiusCurvature"]
+    s = properties["Orientation"]
+    d = properties["Displacement"]
+    z0 = s*d
+
+    R_span = np.arange(-R*1e-3,R*1e-3+1e-3,1e-3)
+    R_length = len(R_span)
+
+    X, Y = np.mgrid[-R:R+1, -R:R+1]
+    X = X*1e-3
+    Y = Y*1e-3
+    Z = np.zeros([R_length, R_length])
+
+    rows, cols = np.mgrid[0:R_length, 0:R_length]
+    C = np.sqrt((rows-R-1)**2 + (cols-R-1)**2)<=R
+
+    Vx = X[C]
+    Vy = Y[C]
+
+    if s == -1:
+        Vz = z0 - np.sqrt(r_c**2 - (Vx)**2 - (Vy)**2) + r_c
+    elif s == 1:
+        Vz = z0 + np.sqrt(r_c**2 - (Vx)**2 - (Vy)**2) - r_c
+    else:
+        Vz = 0
+
+    Vx = Vx.reshape([len(Vx),1])
+    Vy = Vy.reshape([len(Vy),1])
+    Vz = Vz.reshape([len(Vz),1])
+    S = Vx + Vz + Vy
+
+    if np.isnan(S).any():
+        Vx = np.delete(Vx,np.argwhere(np.isnan(S)))
+        Vy = np.delete(Vy,np.argwhere(np.isnan(S)))
+        Vz = np.delete(Vz,np.argwhere(np.isnan(S)))
+    Vx = Vx.reshape([len(Vx),1])
+    Vy = Vy.reshape([len(Vy),1])
+    Vz = Vz.reshape([len(Vz),1])
+
+    return Vx, Vy, Vz
+
+def CreateMedium(Vx,Vz,Ux,Uz):
+
+    xMax = np.round(np.max(Vx)+1e-3,3)
+    xMin = np.round(-np.max(Vx)-1e-3,3)
+    zMax = np.round(np.min(Vz)-1e-3,3)
+    zMin = np.round(np.max(Uz)+1e-3,3)
+
+    print(xMin, xMax, zMin, zMax)
+    x_span = np.arange(xMin, xMax+1e-3, 1e-3)
+    z_span = np.arange(zMin, zMax+1e-3, 1e-3)
+
+    Mx, Mz = np.meshgrid(x_span, z_span, sparse=False)
+
+    sz = Mx.shape
+    My = np.zeros([sz[0],sz[1]])
+
+    szx = Mx.shape
+    Mx = Mx.reshape(szx[0]*szx[1],1)
+
+    szy = My.shape
+    My = My.reshape(szy[0]*szy[1],1)
+
+    szz = Mz.shape
+    Mz = Mz.reshape(szz[0]*szz[1],1)
+
+    return Mx, My, Mz, x_span, z_span
+
+def DistanceMatrices(Vx, Vy, Vz, Ux, Uy, Uz, Mx, My, Mz):
+    nT = len(Vx)
+    nR = len(Ux)
+    nM = len(Mx)
+
+    Ax = np.repeat(Vx,nM,0).reshape(nT,nM).T
+    Bx = np.repeat(Mx.reshape(nM,1),nT,axis=1)
+
+    Ay = np.repeat(Vy,nM,0).reshape(nT,nM).T
+    By = np.repeat(My.reshape(nM,1),nT,axis=1)
+
+    Az = np.repeat(Vz,nM,0).reshape(nT,nM).T
+    Bz = np.repeat(Mz.reshape(nM,1),nT,axis=1)
+
+    r_nm = np.sqrt((Bx-Ax)**2 + (By-Ay)**2 + (Bz-Az)**2)
+
+    Ax = np.repeat(Ux,nM,0).reshape(nR,nM).T
+    Bx = np.repeat(Mx.reshape(nM,1),nR,axis=1)
+
+    Ay = np.repeat(Uy,nM,0).reshape(nR,nM).T
+    By = np.repeat(My.reshape(nM,1),nR,axis=1)
+
+    Az = np.repeat(Uz,nM,0).reshape(nR,nM).T
+    Bz = np.repeat(Mz.reshape(nM,1),nR,axis=1)
+
+    r_im = np.sqrt((Bx-Ax)**2 + (By-Ay)**2 + (Bz-Az)**2)
+
+    Ax = np.repeat(Ux.reshape(nR,1), nT, 1)
+    Bx = np.repeat(Vx, nR, 0).reshape(nR, nT)
+
+    Ay = np.repeat(Uy.reshape(nR,1), nT, 1)
+    By = np.repeat(Vy, nR, 0).reshape(nR, nT)
+
+    Az = np.repeat(Uz.reshape(nR,1), nT, 1)
+    Bz = np.repeat(Vz, nR, 0).reshape(nR, nT)
+
+    r_in = np.sqrt((Bx-Ax)**2 + (By-Ay)**2 + (Bz-Az)**2).T
+    r_ni = r_in.T
+
+    return r_nm, r_im, r_in, r_ni
+
+### NOTE: Functions TransferMatrices and ComputePressure aren't being used, see m-files
+def TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_im, r_in, r_ni):
+
+    Sn = 1e-6
+    Si = 1e-6
+
+    c = mediumProperties["SpeedOfSound"]
+    f1 = zPosProperties["TransFreq"]
+    f2 = zNegProperties["TransFreq"]
+
+    if f1 != 0:
+        wL1 = c/f1
+        kk1 = 2*np.pi/wL1
+    elif f1 == 0:
+        wL1 = 0
+        kk1 = 0
+    if f2 != 0:
+        wL2 = c/f2
+        kk2 = 2*np.pi/wL2
+    elif f2 == 0:
+        wL2 = 0
+        kk2 = 0
+
+    if zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Array":
+        T_TR = Sn*np.exp(-1j*kk1*r_in - 1j*kk2*r_ni)/(r_in)
+        T_RT = Si*np.exp(-1j*kk1*r_ni - 1j*kk2*r_in)/(r_ni)
+        T_RM = Sn*np.exp(-1j*kk1*r_im)/r_im
+        T_TM = Si*np.exp(-1j*kk2*r_nm)/r_nm
+    elif zPosProperties["Type"] == "Array" and zNegProperties["Type"] =="Reflector":
+        T_TR = Sn*np.exp(-1j*kk1*r_in)/(r_in)
+        T_RT = Si*np.exp(-1j*kk1*r_ni)/(r_ni)
+        T_RM = Sn*np.exp(-1j*kk1*r_im)/(r_im)
+        T_TM = Si*np.exp(-1j*kk1*r_nm)/(r_nm)
+    elif zPosProperties["Type"] == "Reflector" and zNegProperties["Type"] =="Array":
+        T_TR = Sn*np.exp(-1j*kk2*r_in)/(r_in)
+        T_RT = Si*np.exp(-1j*kk2*r_ni)/(r_ni)
+        T_RM = Sn*np.exp(-1j*kk2*r_im)/(r_im)
+        T_TM = Si*np.exp(-1j*kk2*r_nm)/(r_nm)
+    elif zPosProperties["Type"] == "Reflector" and zNegProperties["Type"] =="Reflector":
+        T_TR = (r_in)*0
+        T_RT = (r_ni)*0
+        T_RM = (r_im)*0
+        T_TM = (r_nm)*0
+
+    return T_RT, T_TR, T_RM, T_TM
+
+def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProperties,nT,nR,nM):
+
+    t = 0
+    f1 = zPosProperties["TransFreq"]
+    f2 = zNegProperties["TransFreq"]
+    d1 = zPosProperties["Amplitude"]
+    d2 = zNegProperties["Amplitude"]
+
+    rho = mediumProperties["Density"]
+    c = mediumProperties["SpeedOfSound"]
+
+    if f1 != 0:
+        wL1 = c/f1
+        omega1 = 2 * np.pi * f1
+        U1 = np.ones([nT, 1])*d1*np.exp(-1j*(omega1*t))
+        A1 = (1j/wL1)
+        C1 = omega1*rho*c/wL1
+    if f1 == 0:
+        wL1 = 0
+        omega1 = 0
+        U1 = np.zeros([nT, 1])
+        A1 = 0
+        C1 = 0
+
+    if f2 != 0:
+        wL2 = c/f2
+        omega2 = 2 * np.pi * f2
+        U2 = -np.ones([nR, 1])*d2*np.exp(-1j*(omega2*t))
+        A2 = (1j/wL2)
+        C2 = omega2*rho*c/wL2
+    if f2 == 0:
+        wL2 = 0
+        omega2 = 0
+        U2 = np.zeros([nR, 1])
+        A2 = 0
+        C2 = 0
+
+    try:
+        PT = (C1)*T_TM@U1
+        + (C1)*(A1)*T_RM@T_TR@U1
+        + (C1)*(A1**2)*T_TM@T_RT@T_TR@U1
+        + (C1)*(A1**3)*T_RM@T_TR@T_RT@T_TR@U1
+        + (C1)*(A1**4)*T_TM@T_RT@T_TR@T_RT@T_TR@U1
+        + (C1)*(A1**5)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@U1
+        + (C1)*(A1**6)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1
+    except:
+        PT = np.zeros([nM,1])
+
+    try:
+        PR = (C2)*T_RM@U2
+        + (C2)*(A2)*T_TM@T_RT@U2
+        + (C2)*(A2**2)*T_RM@T_TR@T_RT@U2
+        + (C2)*(A2**3)*T_TM@T_RT@T_TR@T_RT@U2
+        + (C2)*(A2**4)*T_RM@T_TR@T_RT@T_TR@T_RT@U2
+        + (C2)*(A2**5)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@U2
+        + (C2)*(A2**6)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@U2
+    except:
+        PR = np.zeros([nM,1])
+
+    P = PT + PR
+    return P
+
+def ComputeRelativePotential(Ptotal, mediumProperties, zPosProperties, zNegProperties):
+    c = mediumProperties["SpeedOfSound"]
+    rho = mediumProperties["Density"]
+    f = zPosProperties["TransFreq"]
+    w = c/f
+    p = np.real(Ptotal)
+
+    phi = -Ptotal/(1j*w*rho)
+
+    gradx, grady = np.gradient(phi,5e-4,5e-4)
+    gradP = np.sqrt(gradx**2 + grady**2)
+    T1 = (np.real(Ptotal*np.conj(Ptotal)))/(3*rho*c**2)
+    T2 = -0.5*rho*(np.real(np.multiply(gradP,np.conj(gradP))))
+    potential = T1+T2
+
+    return potential
+
+def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
+
+    if zPosProperties["Type"] == "Array":
+        print("Creating array...")
+        start = time.time()
+
+        Vx, Vy, Vz = CreateArray(zPosProperties)
+
+        end = time.time()
+        diff = end - start
+        print("Create array took %.6f" % diff, "seconds")
+
+    elif zPosProperties["Type"] == "Reflector":
+        print("Creating reflector...")
+        start = time.time()
+
+        Vx, Vy, Vz = CreateReflector(zPosProperties)
+
+        end = time.time()
+        diff = end - start
+        print("Create reflector took %.6f" % diff, "seconds")
+    else:
+        Vx = 0
+        Vy = 0
+        Vz = 0
+
+    if zNegProperties["Type"] == "Array":
+        print("Creating array...")
+        start = time.time()
+
+        Ux, Uy, Uz = CreateArray(zNegProperties)
+
+        end = time.time()
+        diff = end - start
+        print("Create array took %.6f" % diff, "seconds")
+
+    elif zNegProperties["Type"] == "Reflector":
+        print("Creating reflector...")
+        start = time.time()
+
+        Ux, Uy, Uz = CreateReflector(zNegProperties)
+
+        end = time.time()
+        diff = end - start
+        print("Create reflector took %.6f" % diff, "seconds")
+    else:
+        Ux = 0
+        Uy = 0
+        Uz = 0
+
+    print("Creating mediunp...")
+    start = time.time()
+    Mx, My, Mz, x_span, z_span = CreateMedium(Vx, Vz, Ux, Uz)
+    end = time.time()
+    diff = end - start
+    print("Creating medium took %.6f" % diff, "seconds")
+
+    oc = Oct2Py()
+    f1 = zPosProperties["TransFreq"]
+    f2 = zNegProperties["TransFreq"]
+    d1 = zPosProperties["Amplitude"]
+    d2 = zNegProperties["Amplitude"]
+    rho = mediumProperties["Density"]
+    c = mediumProperties["SpeedOfSound"]
+    type1 = zPosProperties["Type"]
+    type2 = zNegProperties["Type"]
+
+    nT = len(Vx)
+    nR = len(Ux)
+    nM = len(Mx)
+
+    r_im = oc.MakeRim(Ux, Uy, Uz, Mx, My, Mz)
+    r_nm = oc.MakeRnm(Vx, Vy, Vz, Mx, My, Mz)
+    r_in = oc.MakeRin(Vx, Vy, Vz, Ux, Uy, Uz)
+    r_ni = r_in.T
+
+    T_TR = oc.MakeTTR(type1, type2, rho, c, f1, f2, r_in, r_ni)
+    T_RT = oc.MakeTRT(type1, type2, rho, c, f1, f2, r_in, r_ni)
+    T_RM = oc.MakeTRM(type1, type2, rho, c, f1, f2, r_im)
+    T_TM = oc.MakeTTM(type1, type2, rho, c, f1, f2, r_nm)
+
+    print("Computing pressure matrix...")
+    start = time.time()
+    #pressure = ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProperties,nT,nR,nM)
+    pressure = oc.ComputePressure(rho,c,T_TR,T_RT,T_RM,T_TM,f1,f2,d1,d2,nT,nR)
+    end = time.time()
+    diff = end - start
+    print("Computing pressure matrices took %.6f" % diff, "seconds")
+
+    x = len(x_span)
+    z = len(z_span)
+    P_ = pressure.reshape([z, x])
+
+    print("Computing relative acoustic potential...")
+    start = time.time()
+    relative_potential = ComputeRelativePotential(P_, mediumProperties, zPosProperties, zNegProperties)
+    end = time.time()
+    diff = end - start
+    print("Computing relative acoustic potential took %.6f" % diff, "seconds")
+
+    return relative_potential, pressure, x_span, z_span
+
+def mainMatrixMethod(orientation1, type1, shape1, rcurve1, layers1, depth01,
+depth02, depth03, depth04, depth05, depth06, depth07, depth08, radius1, transfreq1,
+amplitude1, displacement1, transradius1, orientation2, type2, shape2, rcurve2,
+layers2, depth11, depth12, depth13, depth14, depth15, depth16, depth17, depth18, radius2,
+transfreq2, amplitude2, displacement2, transradius2):
+
+    def properties_fix(properties):
+
+        if properties["Type"] == "Reflector":
+            properties["Layers"] = 0
+            properties["Depth"] = [0, 0, 0, 0, 0, 0, 0]
+            properties["TransFreq"] = 0
+            properties["Amplitude"] = 0
+            properties["TransRadius"] = 0
+
+        properties_fixed = properties
+        return properties_fixed
+    mediumProperties = {"Density": 1.2, "SpeedOfSound": 343}
+
+    zPosProperties = {
+                    "Orientation": orientation1,
+                    "Type": type1,
+                    "Shape": shape1,
+                    "RadiusCurvature": rcurve1,
+                    "Layers": layers1,
+                    "Depth": [depth01, depth02, depth03, depth04, depth05, depth06, depth07, depth08],
+                    "Radius": radius1,
+                    "TransFreq": transfreq1,
+                    "Amplitude": amplitude1,
+                    "Displacement": displacement1,
+                    "TransRadius": transradius1
+    }
+
+    zNegProperties = {
+                    "Orientation": orientation2,
+                    "Type": type2,
+                    "Shape": shape2,
+                    "RadiusCurvature": rcurve2,
+                    "Layers": layers2,
+                    "Depth": [depth11, depth12, depth13, depth14, depth15, depth16, depth17, depth18],
+                    "Radius": radius2,
+                    "TransFreq": transfreq2,
+                    "Amplitude": amplitude2,
+                    "Displacement": displacement2,
+                    "TransRadius": transradius2
+    }
+
+    zNegProperties = properties_fix(zNegProperties)
+    zPosProperties = properties_fix(zPosProperties)
+
+    relative_potential, pressure, x_span, z_span = MatrixMethod(mediumProperties, zPosProperties, zNegProperties)
+
+    return relative_potential, pressure, x_span, z_span
+
+def CreateGeometry(zPosProperties, zNegProperties):
+    if zPosProperties["Type"] == "Array":
+        Vx, Vy, Vz = CreateArray(zPosProperties)
+    elif zPosProperties["Type"] == "Reflector":
+        Vx, Vy, Vz = CreateReflector(zPosProperties)
+    else:
+        Vx = 0
+        Vy = 0
+        Vz = 0
+
+    if zNegProperties["Type"] == "Array":
+        Ux, Uy, Uz = CreateArray(zNegProperties)
+    elif zNegProperties["Type"] == "Reflector":
+        Ux, Uy, Uz = CreateReflector(zNegProperties)
+    else:
+        Ux = 0
+        Uy = 0
+        Uz = 0
+    return Ux, Uy, Uz, Vx, Vy, Vz
