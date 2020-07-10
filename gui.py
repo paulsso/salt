@@ -374,7 +374,7 @@ class masterframe(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.geometry("790x800")
-        self.iconbitmap("./resources/icon.ico")
+        self.iconbitmap("./icon.ico")
         self.title("Acoustic Potential Simulator")
         self.frames = {}
 
