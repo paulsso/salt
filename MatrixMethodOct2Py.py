@@ -1,12 +1,10 @@
-import time, sys
-try:
-    import numpy as np
-except:
-
+import time, os
 try:
     from oct2py import Oct2Py
 except:
-
+    os.system("pip install oct2py")
+    from oct2py import Oct2Py
+    
 def CreateArray(properties):
     transducer_radius = properties["TransRadius"]
     transducer_per_layer = properties["Depth"]

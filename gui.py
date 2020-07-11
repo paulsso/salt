@@ -1,15 +1,33 @@
-import numpy as np
-from tkinter import *
-import tkinter as tk
-from tkinter import ttk
-from PIL import ImageTk, Image
+import os, sys
 from MatrixMethodOct2Py import MatrixMethod, CreateGeometry
-from matplotlib import pyplot as plt
-import matplotlib, os, sys
-matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-from matplotlib.figure import Figure
-from mpl_toolkits.mplot3d import axes3d, Axes3D
+try:
+    import numpy as np
+    import matplotlib
+    from tkinter import *
+    import tkinter as tk
+    from tkinter import ttk
+    from PIL import ImageTk, Image
+    from matplotlib import pyplot as plt
+    matplotlib.use("TkAgg")
+    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+    from matplotlib.figure import Figure
+    from mpl_toolkits.mplot3d import axes3d, Axes3D
+except:
+    os.system("pip install tkinter")
+    os.system("pip install matplotlib")
+    os.system("pip install pillow")
+    os.system("pip install numpy")
+    import matplotlib
+    import numpy as np
+    from tkinter import *
+    import tkinter as tk
+    from tkinter import ttk
+    from PIL import ImageTk, Image
+    from matplotlib import pyplot as plt
+    matplotlib.use("TkAgg")
+    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+    from matplotlib.figure import Figure
+    from mpl_toolkits.mplot3d import axes3d, Axes3D
 
 class masterframe(tk.Tk):
 
