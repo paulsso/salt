@@ -16,42 +16,48 @@ class masterframe(tk.Tk):
     def __init__(self, *args, **kwargs):
 
         def window1(self, frame):
-"""Frame for top component being an array"""
+            """Frame for top component being an array"""
 
             self.vdisp1_lab = Label(frame, text="Vertical displacement (mm)")
             self.vdisp1_lab.pack(pady=5)
             self.vdisp1_var = DoubleVar() # Vertical displacement
             self.vdisp1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
             orient=HORIZONTAL, variable = self.vdisp1_var, length=250)
-            self.vdisp1_scale.pack()
+            self.vdisp1_scale.pack(padx=10, pady=2)
 
             self.roc1_lab = Label(frame, text="Radius of Curvature (mm)")
             self.roc1_lab.pack(pady=5)
             self.rcurv1_var = DoubleVar() # Radius of curvature
             self.rcurv1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
             orient=HORIZONTAL, variable = self.rcurv1_var, length=250)
-            self.rcurv1_scale.pack()
+            self.rcurv1_scale.pack(padx=10, pady=2)
 
             self.layers1_lab = Label(frame, text="Number of layers")
             self.layers1_lab.pack(pady=5)
             self.layers1_var = DoubleVar() # Number of layers
             self.layers1_scale = Scale(frame, from_=1, to=8, tickinterval=1,
             orient=HORIZONTAL, variable = self.layers1_var, length=250)
-            self.layers1_scale.pack()
+            self.layers1_scale.pack(padx=10, pady=2)
 
             self.sock1_lab = Label(frame, text="Socket radius (mm)")
             self.sock1_lab.pack(pady=5)
             self.radius1_var = DoubleVar() # Disc radius
             self.radius1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
             orient=HORIZONTAL, variable = self.radius1_var, length=250)
-            self.radius1_scale.pack()
+            self.radius1_scale.pack(padx=10, pady=2)
+
+            self.phase1_lab = Label(frame, text = "Phase shift (degrees)")
+            self.phase1_lab.pack(pady=5)
+            self.phase1_var = DoubleVar()
+            self.phase1_scale = Scale(frame, from_=0, to=179, tickinterval = 90,
+            orient=HORIZONTAL, variable = self.phase1_var, length=250)
+            self.phase1_scale.pack(padx=10, pady=2)
 
             self.transfreq1_lab = Label(frame, text="Transducer frequency (kHz):")
             self.transfreq1_lab.pack(pady=5)
             self.transfreq1_var = DoubleVar()
             self.transfreq1_ent = Entry(frame, width = 8, textvariable = self.transfreq1_var)
-            self.transfreq1_ent.pack(padx=10, pady=10)
-            self.transfreq1_ent.place(x=225, y=406)
+            self.transfreq1_ent.pack(padx=10, pady=2)
 
             self.depth1_lab = Label(frame, text="Number of transducers per layer")
             self.depth1_lab.pack(pady=5)
@@ -63,8 +69,9 @@ class masterframe(tk.Tk):
                 self.depth1_ent[i] = Entry(frame, width=2, textvariable = self.depth1_var[i])
                 self.depth1_ent[i].pack(side=LEFT, padx=10, pady=10)
 
+
         def window2(self, frame):
-"""Frame for top component being a reflector"""
+            """Frame for top component being a reflector"""
             self.depth1_var = [0]*8
             self.depth1_ent = [0]*8
             self.transfreq1_var = DoubleVar()
@@ -83,59 +90,65 @@ class masterframe(tk.Tk):
             self.vdisp1_var = DoubleVar() # Vertical displacement
             self.vdisp1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
             orient=HORIZONTAL, variable = self.vdisp1_var, length=250)
-            self.vdisp1_scale.pack()
+            self.vdisp1_scale.pack(padx=10, pady=2)
 
             self.roc1_lab = Label(frame, text="Radius of curvature (mm)")
             self.roc1_lab.pack(pady=5)
             self.rcurv1_var = DoubleVar() # Radius of curvature
             self.rcurv1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
             orient=HORIZONTAL, variable = self.rcurv1_var, length=250)
-            self.rcurv1_scale.pack()
+            self.rcurv1_scale.pack(padx=10, pady=2)
 
             self.sock1_lab = Label(frame, text="Socket radius (mm)")
             self.sock1_lab.pack(pady=5)
             self.radius1_var = DoubleVar() # Disc radius
             self.radius1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
             orient=HORIZONTAL, variable = self.radius1_var, length=250)
-            self.radius1_scale.pack()
+            self.radius1_scale.pack(padx=10, pady=2)
 
         def window3(self, frame):
-"""Frame for bottom component being an array"""
+            """Frame for bottom component being an array"""
 
             self.vdisp2_lab = Label(frame, text="Vertical displacement (mm)")
             self.vdisp2_lab.pack(pady=5)
             self.vdisp2_var = DoubleVar() # Vertical displacement
             self.vdisp2_scale = Scale(frame, from_=0, to=100, tickinterval=50,
             orient=HORIZONTAL, variable = self.vdisp2_var, length=250)
-            self.vdisp2_scale.pack()
+            self.vdisp2_scale.pack(padx=10, pady=2)
 
             self.roc2_lab = Label(frame, text="Radius of curvature (mm)")
             self.roc2_lab.pack(pady=5)
             self.rcurv2_var = DoubleVar() # Radius of curvature
             self.rcurv2_scale = Scale(frame, from_=0, to=100, tickinterval=50,
             orient=HORIZONTAL, variable = self.rcurv2_var, length=250)
-            self.rcurv2_scale.pack()
+            self.rcurv2_scale.pack(padx=10, pady=2)
 
             self.layers2_lab = Label(frame, text="Number of layers")
             self.layers2_lab.pack(pady=5)
             self.layers2_var = DoubleVar() # Number of layers
             self.layers2_scale = Scale(frame, from_=1, to=8, tickinterval=1,
             orient=HORIZONTAL, variable = self.layers2_var, length=250)
-            self.layers2_scale.pack()
+            self.layers2_scale.pack(padx=10, pady=2)
 
             self.sock2_lab = Label(frame, text="Socket radius (mm)")
             self.sock2_lab.pack(pady=5)
             self.radius2_var = DoubleVar() # Disc radius
             self.radius2_scale = Scale(frame, from_=0, to=100, tickinterval=50,
             orient=HORIZONTAL, variable = self.radius2_var, length=250)
-            self.radius2_scale.pack()
+            self.radius2_scale.pack(padx=10, pady=2)
+
+            self.phase2_lab = Label(frame, text = "Phase shift (degrees)")
+            self.phase2_lab.pack()
+            self.phase2_var = DoubleVar()
+            self.phase2_scale = Scale(frame, from_=0, to=179, tickinterval = 90,
+            orient=HORIZONTAL, variable = self.phase2_var, length=250)
+            self.phase2_scale.pack(padx=10, pady=2)
 
             self.transfreq2_lab = Label(frame, text="Transducer frequency (kHz)")
             self.transfreq2_lab.pack(pady=5)
             self.transfreq2_var = DoubleVar()
             self.transfreq2_ent = Entry(frame, width = 8, textvariable = self.transfreq2_var)
-            self.transfreq2_ent.pack(padx=10, pady=10)
-            self.transfreq2_ent.place(x=225, y=406)
+            self.transfreq2_ent.pack(padx=10, pady=2)
 
             self.depth2_lab = Label(frame, text="Number of transducers per layer")
             self.depth2_lab.pack(pady=5)
@@ -147,8 +160,9 @@ class masterframe(tk.Tk):
                 self.depth2_ent[i] = Entry(frame, width=2, textvariable = self.depth2_var[i])
                 self.depth2_ent[i].pack(side=LEFT, padx=10, pady=10)
 
+
         def window4(self, frame):
-"""Frame for bottom component being a reflector"""
+            """Frame for bottom component being a reflector"""
 
             self.depth2_var = [0]*8
             self.depth2_ent = [0]*8
@@ -185,7 +199,7 @@ class masterframe(tk.Tk):
             self.radius2_scale.pack()
 
         def show1(none=0):
-"""function which destroys old frame widgets and calls function to open new frame""""
+            """function which destroys old frame widgets and calls function to open new frame"""
             if hasattr(self, 'vdisp1_scale'):
                 self.vdisp1_scale.destroy()
                 self.rcurv1_scale.destroy()
@@ -212,6 +226,11 @@ class masterframe(tk.Tk):
             if hasattr(self, 'transfreq1_lab'):
                 self.transfreq1_lab.destroy()
 
+            if hasattr(self, 'phase1_lab'):
+                self.phase1_lab.destroy()
+            if hasattr(self, 'phase1_scale'):
+                self.phase1_scale.destroy()
+
             checkThisString = self.clicked1.get()
             if checkThisString == "Array":
                 window1(self,frame)
@@ -219,7 +238,7 @@ class masterframe(tk.Tk):
                 window2(self,frame)
 
         def show2(none=0):
-"""function which destroys old frame widgets and calls function to open new frame""""
+            """function which destroys old frame widgets and calls function to open new frame"""
 
             if hasattr(self, 'vdisp2_scale'):
                 self.vdisp2_scale.destroy()
@@ -247,6 +266,11 @@ class masterframe(tk.Tk):
             if hasattr(self, 'transfreq2_lab'):
                 self.transfreq2_lab.destroy()
 
+            if hasattr(self, 'phase2_lab'):
+                self.phase2_lab.destroy()
+            if hasattr(self, 'phase2_scale'):
+                self.phase2_scale.destroy()
+
             checkThisString = self.clicked2.get()
             if checkThisString == "Array":
                 window3(self,frame2)
@@ -254,7 +278,7 @@ class masterframe(tk.Tk):
                 window4(self,frame2)
 
         def render(self):
-"""Function organizes input from widgets and plots the geometry"""
+            """Function organizes input from widgets and plots the geometry"""
             def properties_fix(properties):
                 if properties["Type"] == "Reflector":
                     properties["Layers"] = 0
@@ -268,7 +292,7 @@ class masterframe(tk.Tk):
             zPosProperties = {
                             "Orientation": 1,
                             "Type": self.clicked1.get(),
-                            "Shape": "shape1",
+                            "Phase": self.phase1_scale.get(),
                             "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
                             "Layers": self.layers1_scale.get(),
                             "Depth": [int(self.depth1_ent[0].get()), int(self.depth1_ent[1].get()), int(self.depth1_ent[2].get()), int(self.depth1_ent[3].get()), int(self.depth1_ent[4].get()), int(self.depth1_ent[5].get()),
@@ -283,7 +307,7 @@ class masterframe(tk.Tk):
             zNegProperties = {
                             "Orientation": -1,
                             "Type": self.clicked2.get(),
-                            "Shape": "shape2",
+                            "Phase": self.phase2_scale.get(),
                             "RadiusCurvature": self.rcurv2_scale.get()*1e-3,
                             "Layers": self.layers2_scale.get(),
                             "Depth": [int(self.depth2_ent[0].get()), int(self.depth2_ent[1].get()), int(self.depth2_ent[2].get()), int(self.depth2_ent[3].get()), int(self.depth2_ent[4].get()), int(self.depth2_ent[5].get()),
@@ -310,7 +334,7 @@ class masterframe(tk.Tk):
             plt.show()
 
         def compute(self):
-"""Calls function to run computations and plots result"""
+            """Calls function to run computations and plots result"""
             def properties_fix(properties):
                 if properties["Type"] == "Reflector":
                     properties["Layers"] = 0
@@ -325,7 +349,7 @@ class masterframe(tk.Tk):
             zPosProperties = {
                             "Orientation": 1,
                             "Type": self.clicked1.get(),
-                            "Shape": "shape1",
+                            "Phase": self.phase1_scale.get(),
                             "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
                             "Layers": self.layers1_scale.get(),
                             "Depth": [int(self.depth1_ent[0].get()), int(self.depth1_ent[1].get()), int(self.depth1_ent[2].get()), int(self.depth1_ent[3].get()), int(self.depth1_ent[4].get()), int(self.depth1_ent[5].get()),
@@ -340,7 +364,7 @@ class masterframe(tk.Tk):
             zNegProperties = {
                             "Orientation": -1,
                             "Type": self.clicked2.get(),
-                            "Shape": "shape2",
+                            "Phase": self.phase2_scale.get(),
                             "RadiusCurvature": self.rcurv2_scale.get()*1e-3,
                             "Layers": self.layers2_scale.get(),
                             "Depth": [int(self.depth2_ent[0].get()), int(self.depth2_ent[1].get()), int(self.depth2_ent[2].get()), int(self.depth2_ent[3].get()), int(self.depth2_ent[4].get()), int(self.depth2_ent[5].get()),
@@ -375,7 +399,7 @@ class masterframe(tk.Tk):
 
         self.geometry("790x800")
         self.iconbitmap("./icon.ico")
-        self.title("Acoustic Potential Simulator")
+        self.title("Simulation Platform for Acoustic Levitation Traps (SALT)")
         self.frames = {}
 
         self.clicked1 = StringVar()

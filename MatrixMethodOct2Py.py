@@ -1,8 +1,11 @@
-import time
-import numpy as np
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import axes3d, Axes3D
-from oct2py import Oct2Py
+import time, sys
+try:
+    import numpy as np
+except:
+
+try:
+    from oct2py import Oct2Py
+except:
 
 def CreateArray(properties):
     transducer_radius = properties["TransRadius"]
@@ -95,13 +98,12 @@ def CreateReflector(properties):
     return Vx, Vy, Vz
 
 def CreateMedium(Vx,Vz,Ux,Uz):
-
+    """Function generates points in a plane between components where pressure will be calculated"""
     xMax = np.round(np.max(Vx)+1e-3,3)
     xMin = np.round(-np.max(Vx)-1e-3,3)
     zMax = np.round(np.min(Vz)-1e-3,3)
     zMin = np.round(np.max(Uz)+1e-3,3)
 
-    print(xMin, xMax, zMin, zMax)
     x_span = np.arange(xMin, xMax+1e-3, 1e-3)
     z_span = np.arange(zMin, zMax+1e-3, 1e-3)
 
@@ -121,7 +123,9 @@ def CreateMedium(Vx,Vz,Ux,Uz):
 
     return Mx, My, Mz, x_span, z_span
 
+### NOTE: Functions TransferMatrices, DistanceMatrices and ComputePressure aren't being used, see m-files
 def DistanceMatrices(Vx, Vy, Vz, Ux, Uy, Uz, Mx, My, Mz):
+    """Function computes the distance between measurement plane and components"""
     nT = len(Vx)
     nR = len(Ux)
     nM = len(Mx)
@@ -162,7 +166,6 @@ def DistanceMatrices(Vx, Vy, Vz, Ux, Uy, Uz, Mx, My, Mz):
 
     return r_nm, r_im, r_in, r_ni
 
-### NOTE: Functions TransferMatrices and ComputePressure aren't being used, see m-files
 def TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_im, r_in, r_ni):
 
     Sn = 1e-6
@@ -337,7 +340,7 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
         Uy = 0
         Uz = 0
 
-    print("Creating mediunp...")
+    print("Creating medium...")
     start = time.time()
     Mx, My, Mz, x_span, z_span = CreateMedium(Vx, Vz, Ux, Uz)
     end = time.time()
@@ -349,6 +352,8 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
     f2 = zNegProperties["TransFreq"]
     d1 = zPosProperties["Amplitude"]
     d2 = zNegProperties["Amplitude"]
+    t1 = zPosProperties["Phase"]
+    t2 = zNegProperties["Phase"]
     rho = mediumProperties["Density"]
     c = mediumProperties["SpeedOfSound"]
     type1 = zPosProperties["Type"]
@@ -371,7 +376,7 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
     print("Computing pressure matrix...")
     start = time.time()
     #pressure = ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProperties,nT,nR,nM)
-    pressure = oc.ComputePressure(rho,c,T_TR,T_RT,T_RM,T_TM,f1,f2,d1,d2,nT,nR)
+    pressure = oc.ComputePressure(rho,c,T_TR,T_RT,T_RM,T_TM,t1,t2,f1,f2,d1,d2,nT,nR)
     end = time.time()
     diff = end - start
     print("Computing pressure matrices took %.6f" % diff, "seconds")
