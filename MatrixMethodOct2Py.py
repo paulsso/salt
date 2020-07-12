@@ -1,10 +1,11 @@
 import time, os
+import numpy as np
 try:
     from oct2py import Oct2Py
 except:
     os.system("pip install oct2py")
     from oct2py import Oct2Py
-    
+
 def CreateArray(properties):
     transducer_radius = properties["TransRadius"]
     transducer_per_layer = properties["Depth"]
@@ -102,8 +103,8 @@ def CreateMedium(Vx,Vz,Ux,Uz):
     zMax = np.round(np.min(Vz)-1e-3,3)
     zMin = np.round(np.max(Uz)+1e-3,3)
 
-    x_span = np.arange(xMin, xMax+1e-3, 1e-3)
-    z_span = np.arange(zMin, zMax+1e-3, 1e-3)
+    x_span = np.arange(xMin, xMax+5e-3, 5e-3)
+    z_span = np.arange(zMin, zMax+5e-3, 5e-3)
 
     Mx, Mz = np.meshgrid(x_span, z_span, sparse=False)
 
