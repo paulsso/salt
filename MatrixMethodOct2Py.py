@@ -220,6 +220,15 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
 
     rho = mediumProperties["Density"]
     c = mediumProperties["SpeedOfSound"]
+    PT0 = np.zeros([nM,1])
+    PT1 = np.zeros([nM,1])
+    PT2 = np.zeros([nM,1])
+    PT3 = np.zeros([nM,1])
+    PT4 = np.zeros([nM,1])
+    PT5 = np.zeros([nM,1])
+    PT6 = np.zeros([nM,1])
+    PR0 = np.zeros([nM,1])
+    PR1 = np.zeros([nM,1])
 
     if f1 != 0:
         wL1 = c/f1
@@ -247,27 +256,16 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
         A2 = 0
         C2 = 0
 
-    try:
-        PT = (C1)*T_TM@U1
-        + (C1)*(A1)*T_RM@T_TR@U1
-        + (C1)*(A1**2)*T_TM@T_RT@T_TR@U1
-        + (C1)*(A1**3)*T_RM@T_TR@T_RT@T_TR@U1
-        + (C1)*(A1**4)*T_TM@T_RT@T_TR@T_RT@T_TR@U1
-        + (C1)*(A1**5)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@U1
-        + (C1)*(A1**6)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1
-    except:
-        PT = np.zeros([nM,1])
+    if zPosProperties["Type"] == "Transducer" and zNegProperties["Reflector"] == "Reflector":
 
-    try:
-        PR = (C2)*T_RM@U2
-        + (C2)*(A2)*T_TM@T_RT@U2
-        + (C2)*(A2**2)*T_RM@T_TR@T_RT@U2
-        + (C2)*(A2**3)*T_TM@T_RT@T_TR@T_RT@U2
-        + (C2)*(A2**4)*T_RM@T_TR@T_RT@T_TR@T_RT@U2
-        + (C2)*(A2**5)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@U2
-        + (C2)*(A2**6)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@U2
-    except:
-        PR = np.zeros([nM,1])
+    elif zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Array":
+        PT0 = (C1)*T_TM@U1
+        PR0 = (C2)*T_RM@U2
+    elif zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Reflector":
+        PR0 = (C2)*T_RM@U2
+        PR1 = (C2)*(A2)*T_TM@T_RT@U2
+    elif zPosProperties["Type"] == "Reflector" and zNegProperties["Type"] == "Array":
+    
 
     P = PT + PR
     return P
@@ -278,13 +276,14 @@ def ComputeRelativePotential(Ptotal, mediumProperties, zPosProperties, zNegPrope
     f = zPosProperties["TransFreq"]
     w = c/f
     p = np.real(Ptotal)
-
+    sz = Ptotal.shape
+    M = sz[0]*sz[1]
     phi = -Ptotal/(1j*w*rho)
 
     gradx, grady = np.gradient(phi,5e-4,5e-4)
     gradP = np.sqrt(gradx**2 + grady**2)
-    T1 = (np.real(Ptotal*np.conj(Ptotal)))/(3*rho*c**2)
-    T2 = -0.5*rho*(np.real(np.multiply(gradP,np.conj(gradP))))
+    T1 = (np.real(Ptotal*np.conj(Ptotal))/M)/(3*rho*c**2)
+    T2 = -0.5*rho*(np.real(np.multiply(gradP,np.conj(gradP)))/M)
     potential = T1+T2
 
     return potential
@@ -361,21 +360,30 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
     nT = len(Vx)
     nR = len(Ux)
     nM = len(Mx)
-
+    print("Computing distance matrices...")
+    start = time.time()
     r_im = oc.MakeRim(Ux, Uy, Uz, Mx, My, Mz)
     r_nm = oc.MakeRnm(Vx, Vy, Vz, Mx, My, Mz)
     r_in = oc.MakeRin(Vx, Vy, Vz, Ux, Uy, Uz)
     r_ni = r_in.T
+    end = time.time()
+    diff = end - start
+    print("Computing distance matrices took %.6f" % diff, "seconds")
 
+    print("Computing transfer matrices...")
+    start = time.time()
     T_TR = oc.MakeTTR(type1, type2, rho, c, f1, f2, r_in, r_ni)
     T_RT = oc.MakeTRT(type1, type2, rho, c, f1, f2, r_in, r_ni)
     T_RM = oc.MakeTRM(type1, type2, rho, c, f1, f2, r_im)
     T_TM = oc.MakeTTM(type1, type2, rho, c, f1, f2, r_nm)
+    end = time.time()
+    diff = end - start
+    print("Computing transfer matrices took %.6f" % diff, "seconds")
 
     print("Computing pressure matrix...")
     start = time.time()
     #pressure = ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProperties,nT,nR,nM)
-    pressure = oc.ComputePressure(rho,c,T_TR,T_RT,T_RM,T_TM,t1,t2,f1,f2,d1,d2,nT,nR)
+    pressure = oc.ComputePressure(rho,c,T_TR,T_RT,T_RM,T_TM,t1,t2,f1,f2,d1,d2,nT,nR,nM,type1,type2)
     end = time.time()
     diff = end - start
     print("Computing pressure matrices took %.6f" % diff, "seconds")
