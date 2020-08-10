@@ -6,24 +6,21 @@ try:
     from tkinter import *
     import tkinter as tk
     from tkinter import ttk
-    from PIL import ImageTk, Image
     from matplotlib import pyplot as plt
     matplotlib.use("TkAgg")
     from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
     from matplotlib.figure import Figure
     from mpl_toolkits.mplot3d import axes3d, Axes3D
-except:
-    os.system("pip install tkinter")
+except ModuleNotFoundError as e:
+    print(e)
     os.system("pip install matplotlib")
-    os.system("pip install pillow")
     os.system("pip install numpy")
-    import matplotlib
+    from matplotlib import pyplot as plt
     import numpy as np
     from tkinter import *
     import tkinter as tk
     from tkinter import ttk
-    from PIL import ImageTk, Image
-    from matplotlib import pyplot as plt
+    import matplotlib
     matplotlib.use("TkAgg")
     from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
     from matplotlib.figure import Figure
@@ -495,7 +492,7 @@ class masterframe(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.geometry("790x800")
-        self.iconbitmap("./icon.ico")
+        self.iconbitmap(".\icon.ico")
         self.title("Simulation Platform for Acoustic Levitation Traps (SALT)")
         self.frames = {}
 

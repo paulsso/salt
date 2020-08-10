@@ -1,6 +1,9 @@
 import time, os
-import numpy as np
-
+try:
+    import numpy as np
+except:
+    os.system("pip install numpy")
+    import numpy as np
 def CreateTransducer(properties):
     R = properties["Radius"]*1e3
     r_c = properties["RadiusCurvature"]
