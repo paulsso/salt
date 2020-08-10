@@ -242,11 +242,11 @@ def TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_i
         T_RT = Si*np.exp(-1j*kk2*r_ni)/(r_ni)
         T_RM = Sn*np.exp(-1j*kk2*r_im)/(r_im)
         T_TM = Si*np.exp(-1j*kk2*r_nm)/(r_nm)
-    elif zPosProperties["Type"] == "Reflector" and zNegProperties["Type"] =="Reflector":
-        T_TR = (r_in)*0
-        T_RT = (r_ni)*0
-        T_RM = (r_im)*0
-        T_TM = (r_nm)*0
+    elif zPosProperties["Type"] == "Transducer" and zNegProperties["Type"] =="Reflector":
+        T_TR = Sn*np.exp(-1j*kk1*r_in)/(r_in)
+        T_RT = Si*np.exp(-1j*kk1*r_ni)/(r_ni)
+        T_RM = Sn*np.exp(-1j*kk1*r_im)/(r_im)
+        T_TM = Si*np.exp(-1j*kk1*r_nm)/(r_nm)
 
     return T_RT, T_TR, T_RM, T_TM
 
@@ -287,17 +287,18 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
         A2 = 0
         C2 = 0
 
-    if zPosProperties["Type"] == "Transducer" and zNegProperties["Reflector"] == "Reflector":
+    if zPosProperties["Type"] == "Transducer" and zNegProperties["Type"] == "Reflector":
         # TODO : COMPUTE PRESSURE WITH MULTIPLE REFLECTIONS
         PT0 = (C1)*T_TM@U1;
         PT1 = (C1)*(A1)*T_RM@T_TR@U1;
-        PT2 = (C1)*(A1^2)*T_TM@T_RT@T_TR@U1;
-        PT3 = (C1)*(A1^3)*T_RM@T_TR@T_RT@T_TR@U1;
-        PT4 = (C1)*(A1^4)*T_TM@T_RT@T_TR@T_RT@T_TR@U1;
-        PT5 = (C1)*(A1^5)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
-        PT6 = (C1)*(A1^6)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
+        PT2 = (C1)*(A1**2)*T_TM@T_RT@T_TR@U1;
+        PT3 = (C1)*(A1**3)*T_RM@T_TR@T_RT@T_TR@U1;
+        PT4 = (C1)*(A1**4)*T_TM@T_RT@T_TR@T_RT@T_TR@U1;
+        PT5 = (C1)*(A1**5)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
+        PT6 = (C1)*(A1**6)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
         PT = PT0 + PT1 + PT2 + PT3 + PT4 + PT5 + PT6
-    elif zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Array":
+        PR = PT*0
+    elif (zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Array") or (zPosProperties["Type"] == "Transducer" and zNegProperties["Type"] == "Array"):
         PT = (C1)*T_TM@U1
         PR = (C2)*T_RM@U2
     elif zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Reflector":
