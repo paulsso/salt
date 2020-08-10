@@ -1,5 +1,5 @@
-import os, sys
-from MatrixMethodOct2Py import MatrixMethod, CreateGeometry
+import os
+from MatrixMethodTest import MatrixMethod, CreateGeometry
 try:
     import numpy as np
     import matplotlib
@@ -86,7 +86,6 @@ class masterframe(tk.Tk):
                 self.depth1_var[i] = IntVar()
                 self.depth1_ent[i] = Entry(frame, width=2, textvariable = self.depth1_var[i])
                 self.depth1_ent[i].pack(side=LEFT, padx=10, pady=10)
-
 
         def window2(self, frame):
             """Frame for top component being a reflector"""
@@ -178,7 +177,6 @@ class masterframe(tk.Tk):
                 self.depth2_ent[i] = Entry(frame, width=2, textvariable = self.depth2_var[i])
                 self.depth2_ent[i].pack(side=LEFT, padx=10, pady=10)
 
-
         def window4(self, frame):
             """Frame for bottom component being a reflector"""
 
@@ -215,6 +213,43 @@ class masterframe(tk.Tk):
             self.radius2_scale = Scale(frame, from_=0, to=100, tickinterval=50,
             orient=HORIZONTAL, variable = self.radius2_var, length=250)
             self.radius2_scale.pack()
+
+        def window5(self,frame):
+            """Top single transducer"""
+
+            self.vdisp1_lab = Label(frame, text="Vertical displacement (mm)")
+            self.vdisp1_lab.pack(pady=5)
+            self.vdisp1_var = DoubleVar() # Vertical displacement
+            self.vdisp1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
+            orient=HORIZONTAL, variable = self.vdisp1_var, length=250)
+            self.vdisp1_scale.pack(padx=10, pady=2)
+
+            self.roc1_lab = Label(frame, text="Radius of Curvature (mm)")
+            self.roc1_lab.pack(pady=5)
+            self.rcurv1_var = DoubleVar() # Radius of curvature
+            self.rcurv1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
+            orient=HORIZONTAL, variable = self.rcurv1_var, length=250)
+            self.rcurv1_scale.pack(padx=10, pady=2)
+
+            self.sock1_lab = Label(frame, text="Socket radius (mm)")
+            self.sock1_lab.pack(pady=5)
+            self.radius1_var = DoubleVar() # Disc radius
+            self.radius1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
+            orient=HORIZONTAL, variable = self.radius1_var, length=250)
+            self.radius1_scale.pack(padx=10, pady=2)
+
+            self.phase1_lab = Label(frame, text = "Phase shift (degrees)")
+            self.phase1_lab.pack(pady=5)
+            self.phase1_var = DoubleVar()
+            self.phase1_scale = Scale(frame, from_=0, to=179, tickinterval = 90,
+            orient=HORIZONTAL, variable = self.phase1_var, length=250)
+            self.phase1_scale.pack(padx=10, pady=2)
+
+            self.transfreq1_lab = Label(frame, text="Transducer frequency (kHz):")
+            self.transfreq1_lab.pack(pady=5)
+            self.transfreq1_var = DoubleVar()
+            self.transfreq1_ent = Entry(frame, width = 8, textvariable = self.transfreq1_var)
+            self.transfreq1_ent.pack(padx=10, pady=2)
 
         def show1(none=0):
             """function which destroys old frame widgets and calls function to open new frame"""
@@ -254,6 +289,8 @@ class masterframe(tk.Tk):
                 window1(self,frame)
             elif checkThisString == "Reflector":
                 window2(self,frame)
+            elif checkThisString == "Transducer":
+                window5(self,frame)
 
         def show2(none=0):
             """function which destroys old frame widgets and calls function to open new frame"""
@@ -307,38 +344,65 @@ class masterframe(tk.Tk):
 
                 properties_fixed = properties
                 return properties_fixed
-            zPosProperties = {
-                            "Orientation": 1,
-                            "Type": self.clicked1.get(),
-                            "Phase": self.phase1_scale.get(),
-                            "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
-                            "Layers": self.layers1_scale.get(),
-                            "Depth": [int(self.depth1_ent[0].get()), int(self.depth1_ent[1].get()), int(self.depth1_ent[2].get()), int(self.depth1_ent[3].get()), int(self.depth1_ent[4].get()), int(self.depth1_ent[5].get()),
-                            int(self.depth1_ent[6].get()), int(self.depth1_ent[7].get())],
-                            "Radius": self.radius1_scale.get()*1e-3,
-                            "TransFreq": float(self.transfreq1_ent.get())*1e3,
-                            "Amplitude": 1e-6,
-                            "Displacement": self.vdisp1_scale.get()*1e-3,
-                            "TransRadius": 4.5e-3
-            }
 
-            zNegProperties = {
-                            "Orientation": -1,
-                            "Type": self.clicked2.get(),
-                            "Phase": self.phase2_scale.get(),
-                            "RadiusCurvature": self.rcurv2_scale.get()*1e-3,
-                            "Layers": self.layers2_scale.get(),
-                            "Depth": [int(self.depth2_ent[0].get()), int(self.depth2_ent[1].get()), int(self.depth2_ent[2].get()), int(self.depth2_ent[3].get()), int(self.depth2_ent[4].get()), int(self.depth2_ent[5].get()),
-                            int(self.depth2_ent[6].get()), int(self.depth2_ent[7].get())],
-                            "Radius": self.radius2_scale.get()*1e-3,
-                            "TransFreq": float(self.transfreq2_ent.get())*1e3,
-                            "Amplitude": 1e-6,
-                            "Displacement": self.vdisp2_scale.get()*1e-3,
-                            "TransRadius": 4.5e-3
-            }
-
-            zNegProperties = properties_fix(zNegProperties)
-            zPosProperties = properties_fix(zPosProperties)
+            if self.clicked1.get() == "Array":
+                zPosProperties = {
+                                "Orientation": 1,
+                                "Type": self.clicked1.get(),
+                                "Phase": self.phase1_scale.get(),
+                                "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
+                                "Layers": self.layers1_scale.get(),
+                                "Depth": [int(self.depth1_ent[0].get()), int(self.depth1_ent[1].get()), int(self.depth1_ent[2].get()), int(self.depth1_ent[3].get()), int(self.depth1_ent[4].get()), int(self.depth1_ent[5].get()),
+                                int(self.depth1_ent[6].get()), int(self.depth1_ent[7].get())],
+                                "Radius": self.radius1_scale.get()*1e-3,
+                                "TransFreq": float(self.transfreq1_ent.get())*1e3,
+                                "Amplitude": 1e-6,
+                                "Displacement": self.vdisp1_scale.get()*1e-3,
+                                "TransRadius": 4.5e-3
+                }
+            elif self.clicked1.get() == "Transducer":
+                zPosProperties = {
+                                "Orientation": 1,
+                                "Type": self.clicked1.get(),
+                                "Phase": self.phase1_scale.get(),
+                                "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
+                                "Layers": 0,
+                                "Depth": [0,0,0,0,0,0,0,0],
+                                "Radius": self.radius1_scale.get()*1e-3,
+                                "TransFreq": float(self.transfreq1_ent.get())*1e3,
+                                "Amplitude": 1e-6,
+                                "Displacement": self.vdisp1_scale.get()*1e-3,
+                                "TransRadius": 4.5e-3
+                }
+            if self.clicked2.get() == "Array":
+                zNegProperties = {
+                                "Orientation": -1,
+                                "Type": self.clicked2.get(),
+                                "Phase": self.phase2_scale.get(),
+                                "RadiusCurvature": self.rcurv2_scale.get()*1e-3,
+                                "Layers": self.layers2_scale.get(),
+                                "Depth": [int(self.depth2_ent[0].get()), int(self.depth2_ent[1].get()), int(self.depth2_ent[2].get()), int(self.depth2_ent[3].get()), int(self.depth2_ent[4].get()), int(self.depth2_ent[5].get()),
+                                int(self.depth2_ent[6].get()), int(self.depth2_ent[7].get())],
+                                "Radius": self.radius2_scale.get()*1e-3,
+                                "TransFreq": float(self.transfreq2_ent.get())*1e3,
+                                "Amplitude": 1e-6,
+                                "Displacement": self.vdisp2_scale.get()*1e-3,
+                                "TransRadius": 4.5e-3
+                }
+            elif self.clicked2.get() == "Reflector":
+                zNegProperties = {
+                                "Orientation": -1,
+                                "Type": self.clicked2.get(),
+                                "Phase": 0,
+                                "RadiusCurvature": self.rcurv2_scale.get()*1e-3,
+                                "Layers": 0,
+                                "Depth": [0,0,0,0,0,0,0,0],
+                                "Radius": self.radius2_scale.get()*1e-3,
+                                "TransFreq": float(self.transfreq2_ent.get())*1e3,
+                                "Amplitude": 1e-6,
+                                "Displacement": self.vdisp2_scale.get()*1e-3,
+                                "TransRadius": 4.5e-3
+                }
 
             Ux, Uy, Uz, Vx, Vy, Vz = CreateGeometry(zPosProperties, zNegProperties)
 
@@ -353,33 +417,39 @@ class masterframe(tk.Tk):
 
         def compute(self):
             """Calls function to run computations and plots result"""
-            def properties_fix(properties):
-                if properties["Type"] == "Reflector":
-                    properties["Layers"] = 0
-                    properties["Depth"] = [0, 0, 0, 0, 0, 0, 0]
-                    properties["TransFreq"] = 0
-                    properties["Amplitude"] = 0
-                    properties["TransRadius"] = 0
 
-                properties_fixed = properties
-                return properties_fixed
             mediumProperties = {"Density": 1.2, "SpeedOfSound": 343}
-            zPosProperties = {
-                            "Orientation": 1,
-                            "Type": self.clicked1.get(),
-                            "Phase": self.phase1_scale.get(),
-                            "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
-                            "Layers": self.layers1_scale.get(),
-                            "Depth": [int(self.depth1_ent[0].get()), int(self.depth1_ent[1].get()), int(self.depth1_ent[2].get()), int(self.depth1_ent[3].get()), int(self.depth1_ent[4].get()), int(self.depth1_ent[5].get()),
-                            int(self.depth1_ent[6].get()), int(self.depth1_ent[7].get())],
-                            "Radius": self.radius1_scale.get()*1e-3,
-                            "TransFreq": float(self.transfreq1_ent.get())*1e3,
-                            "Amplitude": 1e-6,
-                            "Displacement": self.vdisp1_scale.get()*1e-3,
-                            "TransRadius": 4.5e-3
-            }
-
-            zNegProperties = {
+            if self.clicked1.get() == "Array":
+                zPosProperties = {
+                                "Orientation": 1,
+                                "Type": self.clicked1.get(),
+                                "Phase": self.phase1_scale.get(),
+                                "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
+                                "Layers": self.layers1_scale.get(),
+                                "Depth": [int(self.depth1_ent[0].get()), int(self.depth1_ent[1].get()), int(self.depth1_ent[2].get()), int(self.depth1_ent[3].get()), int(self.depth1_ent[4].get()), int(self.depth1_ent[5].get()),
+                                int(self.depth1_ent[6].get()), int(self.depth1_ent[7].get())],
+                                "Radius": self.radius1_scale.get()*1e-3,
+                                "TransFreq": float(self.transfreq1_ent.get())*1e3,
+                                "Amplitude": 1e-6,
+                                "Displacement": self.vdisp1_scale.get()*1e-3,
+                                "TransRadius": 4.5e-3
+                }
+            elif self.clicked1.get() == "Transducer":
+                zPosProperties = {
+                                "Orientation": 1,
+                                "Type": self.clicked1.get(),
+                                "Phase": self.phase1_scale.get(),
+                                "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
+                                "Layers": 0,
+                                "Depth": [0,0,0,0,0,0,0,0],
+                                "Radius": self.radius1_scale.get()*1e-3,
+                                "TransFreq": float(self.transfreq1_ent.get())*1e3,
+                                "Amplitude": 1e-6,
+                                "Displacement": self.vdisp1_scale.get()*1e-3,
+                                "TransRadius": 4.5e-3
+                }
+            if self.clicked2.get() == "Array":
+                zNegProperties = {
                             "Orientation": -1,
                             "Type": self.clicked2.get(),
                             "Phase": self.phase2_scale.get(),
@@ -391,11 +461,20 @@ class masterframe(tk.Tk):
                             "TransFreq": float(self.transfreq2_ent.get())*1e3,
                             "Amplitude": 1e-6,
                             "Displacement": self.vdisp2_scale.get()*1e-3,
-                            "TransRadius": 4.5e-3
-            }
-
-            zNegProperties = properties_fix(zNegProperties)
-            zPosProperties = properties_fix(zPosProperties)
+                            "TransRadius": 4.5e-3}
+            elif self.clicked2.get() == "Reflector":
+                zNegProperties = {
+                            "Orientation": -1,
+                            "Type": self.clicked2.get(),
+                            "Phase": 0,
+                            "RadiusCurvature": self.rcurv2_scale.get()*1e-3,
+                            "Layers": 0,
+                            "Depth": [0,0,0,0,0,0,0,0],
+                            "Radius": self.radius2_scale.get()*1e-3,
+                            "TransFreq": float(self.transfreq2_ent.get())*1e3,
+                            "Amplitude": 1e-6,
+                            "Displacement": self.vdisp2_scale.get()*1e-3,
+                            "TransRadius": 4.5e-3}
 
             relative_potential, pressure, x_span, z_span = MatrixMethod(mediumProperties,zPosProperties,zNegProperties)
             x = len(x_span)
@@ -425,7 +504,7 @@ class masterframe(tk.Tk):
         frame = LabelFrame(self, text="Top component", padx=10, pady=10)
         frame.pack(padx=10, pady=10)
         frame.place(x=50, y=0)
-        drop = OptionMenu(frame, self.clicked1, "Array", "Reflector", command=show1)
+        drop = OptionMenu(frame, self.clicked1, "Array", "Transducer", command=show1)
         drop.pack()
 
         self.clicked2 = StringVar()
