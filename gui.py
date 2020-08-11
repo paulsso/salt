@@ -1,4 +1,4 @@
-import os
+import os, time
 from MatrixMethodTest import MatrixMethod, CreateGeometry
 try:
     import numpy as np
@@ -486,13 +486,13 @@ class masterframe(tk.Tk):
             minPotential = np.min(_relative_potential)
             maxPressure = np.max(_relative_potential)
             minPressure = np.min(_relative_potential)
-            fig=plt.figure(figsize=(8, 6), dpi= 80, facecolor='w', edgecolor='k')
+            fig = plt.figure(figsize=(8, 6), dpi= 80, facecolor='w', edgecolor='k')
             cs = plt.contourf(_relative_potential, np.linspace(minPotential,maxPotential,1000), cmap='jet', extend='both')
             plt.colorbar()
             plt.show()
 
-            fig=plt.figure(figsize=(8, 6), dpi= 80, facecolor='w', edgecolor='k')
-            cs = plt.contourf(_pressure, np.linspace(minPressure,maxPressure,1000), cmap='jet', extend='both')
+            fig2 = plt.figure(figsize=(8, 6), dpi= 80, facecolor='w', edgecolor='k')
+            cs2 = plt.contourf(_pressure, np.linspace(minPressure,maxPressure,1000), cmap='jet', extend='both')
             plt.colorbar()
             plt.show()
 
