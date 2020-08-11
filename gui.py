@@ -473,17 +473,29 @@ class masterframe(tk.Tk):
                             "Displacement": self.vdisp2_scale.get()*1e-3,
                             "TransRadius": 4.5e-3}
 
+            start = time.time()
             relative_potential, pressure, x_span, z_span = MatrixMethod(mediumProperties,zPosProperties,zNegProperties)
+            end = time.time()
+            diff = end - start
+            print("Total time elapsed was %.4f" % diff, "seconds")
             x = len(x_span)
             z = len(z_span)
             _relative_potential = np.real(relative_potential).reshape([z, x])
             _pressure = np.real(pressure).reshape([z, x])
             maxPotential = np.max(_relative_potential)
             minPotential = np.min(_relative_potential)
+            maxPressure = np.max(_relative_potential)
+            minPressure = np.min(_relative_potential)
             fig=plt.figure(figsize=(8, 6), dpi= 80, facecolor='w', edgecolor='k')
             cs = plt.contourf(_relative_potential, np.linspace(minPotential,maxPotential,1000), cmap='jet', extend='both')
             plt.colorbar()
             plt.show()
+
+            fig=plt.figure(figsize=(8, 6), dpi= 80, facecolor='w', edgecolor='k')
+            cs = plt.contourf(_pressure, np.linspace(minPressure,maxPressure,1000), cmap='jet', extend='both')
+            plt.colorbar()
+            plt.show()
+
 
         tk.Tk.__init__(self, *args, **kwargs)
         container = tk.Frame(self)

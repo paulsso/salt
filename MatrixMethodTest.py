@@ -334,25 +334,22 @@ def ComputeRelativePotential(Ptotal, mediumProperties, zPosProperties, zNegPrope
 
 def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
 
+
     if zPosProperties["Type"] == "Array":
         print("Creating array...")
         start = time.time()
-
         Vx, Vy, Vz = CreateArray(zPosProperties)
-
         end = time.time()
-        diff = end - start
-        print("Create array took %.6f" % diff, "seconds")
+        diff1 = end - start
+        print("Create array took %.6f" % diff1, "seconds")
 
     elif zPosProperties["Type"] == "Transducer":
         print("Creating Transducer...")
         start = time.time()
-
         Vx, Vy, Vz = CreateTransducer(zPosProperties)
-
         end = time.time()
-        diff = end - start
-        print("Create transducer took %.6f" % diff, "seconds")
+        diff1 = end - start
+        print("Create transducer took %.6f" % diff1, "seconds")
     else:
         Vx = 0
         Vy = 0
@@ -361,22 +358,18 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
     if zNegProperties["Type"] == "Array":
         print("Creating array...")
         start = time.time()
-
         Ux, Uy, Uz = CreateArray(zNegProperties)
-
         end = time.time()
-        diff = end - start
-        print("Create array took %.6f" % diff, "seconds")
+        diff2 = end - start
+        print("Create array took %.6f" % diff2, "seconds")
 
     elif zNegProperties["Type"] == "Reflector":
         print("Creating reflector...")
         start = time.time()
-
         Ux, Uy, Uz = CreateReflector(zNegProperties)
-
         end = time.time()
-        diff = end - start
-        print("Create reflector took %.6f" % diff, "seconds")
+        diff2 = end - start
+        print("Create reflector took %.6f" % diff2, "seconds")
     else:
         Ux = 0
         Uy = 0
@@ -386,22 +379,22 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
     start = time.time()
     Mx, My, Mz, x_span, z_span = CreateMedium(Vx, Vz, Ux, Uz)
     end = time.time()
-    diff = end - start
-    print("Creating medium took %.6f" % diff, "seconds")
+    diff3 = end - start
+    print("Creating medium took %.6f" % diff3, "seconds")
 
     print("Computing distance matrices...")
     start = time.time()
     r_nm, r_im, r_in, r_ni = DistanceMatrices(Vx, Vy, Vz, Ux, Uy, Uz, Mx, My, Mz)
     end = time.time()
-    diff = end - start
-    print("Computing distance matrices took %.6f" % diff, "seconds")
+    diff4 = end - start
+    print("Computing distance matrices took %.6f" % diff4, "seconds")
 
     print("Computing transfer matrices...")
     start = time.time()
     T_RT, T_TR, T_RM, T_TM = TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_im, r_in, r_ni)
     end = time.time()
-    diff = end - start
-    print("Computing transfer matrices took %.6f" % diff, "seconds")
+    diff5 = end - start
+    print("Computing transfer matrices took %.6f" % diff5, "seconds")
 
     nT = len(Vx)
     nR = len(Ux)
@@ -410,8 +403,8 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
     start = time.time()
     pressure = ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProperties,nT,nR,nM)
     end = time.time()
-    diff = end - start
-    print("Computing pressure matrices took %.6f" % diff, "seconds")
+    diff6 = end - start
+    print("Computing pressure matrices took %.6f" % diff6, "seconds")
 
     x = len(x_span)
     z = len(z_span)
@@ -421,8 +414,8 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
     start = time.time()
     relative_potential = ComputeRelativePotential(P_, mediumProperties, zPosProperties, zNegProperties)
     end = time.time()
-    diff = end - start
-    print("Computing relative acoustic potential took %.6f" % diff, "seconds")
+    diff7 = end - start
+    print("Computing relative acoustic potential took %.6f" % diff7, "seconds")
 
     return relative_potential, pressure, x_span, z_span
 
