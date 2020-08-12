@@ -1,480 +1,284 @@
-import os, time
-from MatrixMethodTest import MatrixMethod, CreateGeometry
+import tkinter as tk
+import time
 try:
     import numpy as np
-    import matplotlib
-    from tkinter import *
-    import tkinter as tk
-    from tkinter import ttk
-    from matplotlib import pyplot as plt
-    matplotlib.use("TkAgg")
-    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-    from matplotlib.figure import Figure
-    from mpl_toolkits.mplot3d import axes3d, Axes3D
-except ModuleNotFoundError as e:
-    print(e)
-    os.system("pip install matplotlib")
+except:
     os.system("pip install numpy")
-    from matplotlib import pyplot as plt
     import numpy as np
-    from tkinter import *
-    import tkinter as tk
-    from tkinter import ttk
-    import matplotlib
-    matplotlib.use("TkAgg")
-    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-    from matplotlib.figure import Figure
-    from mpl_toolkits.mplot3d import axes3d, Axes3D
 
-class masterframe(tk.Tk):
+try:
+    from matplotlib import pyplot as plt
+except:
+    os.system("pip install matplotlib")
+    from matplotlib import pyplot as plt
 
-    def __init__(self, *args, **kwargs):
+from MatrixMethod import MatrixMethod, CreateGeometry
+from mpl_toolkits.mplot3d import axes3d, Axes3D
 
-        def window1(self, frame):
-            """Frame for top component being an array"""
+class types:
+    def array(self, frame):
+        """ Method adds widgets relevant to an array of transducers """
+        labels, scales, entries = [], [], []
+        properties = {}
 
-            self.vdisp1_lab = Label(frame, text="Vertical displacement (mm)")
-            self.vdisp1_lab.pack(pady=5)
-            self.vdisp1_var = DoubleVar() # Vertical displacement
-            self.vdisp1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.vdisp1_var, length=250)
-            self.vdisp1_scale.pack(padx=10, pady=2)
+        labels = np.append(labels, tk.Label(frame, text="Vertical Displacement (mm)"))
+        labels[0].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
+        scales[0].pack(padx=10, pady=2)
+        scales[0].set(68)
 
-            self.roc1_lab = Label(frame, text="Radius of Curvature (mm)")
-            self.roc1_lab.pack(pady=5)
-            self.rcurv1_var = DoubleVar() # Radius of curvature
-            self.rcurv1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.rcurv1_var, length=250)
-            self.rcurv1_scale.pack(padx=10, pady=2)
+        properties.update({"Displacement" : scales[0]})
 
-            self.layers1_lab = Label(frame, text="Number of layers")
-            self.layers1_lab.pack(pady=5)
-            self.layers1_var = DoubleVar() # Number of layers
-            self.layers1_scale = Scale(frame, from_=1, to=8, tickinterval=1,
-            orient=HORIZONTAL, variable = self.layers1_var, length=250)
-            self.layers1_scale.pack(padx=10, pady=2)
+        labels = np.append(labels, tk.Label(frame, text="Radius of Curvature (mm)"))
+        labels[1].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
+        scales[1].pack(padx=10, pady=2)
+        scales[1].set(48)
 
-            self.sock1_lab = Label(frame, text="Socket radius (mm)")
-            self.sock1_lab.pack(pady=5)
-            self.radius1_var = DoubleVar() # Disc radius
-            self.radius1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.radius1_var, length=250)
-            self.radius1_scale.pack(padx=10, pady=2)
+        properties.update({"RadiusCurvature" : scales[1]})
 
-            self.phase1_lab = Label(frame, text = "Phase shift (degrees)")
-            self.phase1_lab.pack(pady=5)
-            self.phase1_var = DoubleVar()
-            self.phase1_scale = Scale(frame, from_=0, to=179, tickinterval = 90,
-            orient=HORIZONTAL, variable = self.phase1_var, length=250)
-            self.phase1_scale.pack(padx=10, pady=2)
+        labels = np.append(labels, tk.Label(frame, text="Socket Radius (mm)"))
+        labels[2].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
+        scales[2].pack(padx=10, pady=2)
+        scales[2].set(50)
 
-            self.transfreq1_lab = Label(frame, text="Transducer frequency (kHz):")
-            self.transfreq1_lab.pack(pady=5)
-            self.transfreq1_var = DoubleVar()
-            self.transfreq1_ent = Entry(frame, width = 8, textvariable = self.transfreq1_var)
-            self.transfreq1_ent.pack(padx=10, pady=2)
+        properties.update({"Radius" : scales[2]})
 
-            self.depth1_lab = Label(frame, text="Number of transducers per layer")
-            self.depth1_lab.pack(pady=5)
-            self.depth1_var = [0]*8
-            self.depth1_ent = [0]*8
+        labels = np.append(labels, tk.Label(frame, text="Phase shift (degrees)"))
+        labels[3].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=179, tickinterval=90,
+        orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
+        scales[3].pack(padx=10, pady=2)
 
-            for i in range(0,8):
-                self.depth1_var[i] = IntVar()
-                self.depth1_ent[i] = Entry(frame, width=2, textvariable = self.depth1_var[i])
-                self.depth1_ent[i].pack(side=LEFT, padx=10, pady=10)
+        properties.update({"Phase" : scales[3]})
 
-        def window2(self, frame):
-            """Frame for top component being a reflector"""
-            self.depth1_var = [0]*8
-            self.depth1_ent = [0]*8
-            self.transfreq1_var = DoubleVar()
-            self.transfreq1_ent = Entry(frame, width = 8, textvariable=self.transfreq1_var)
+        labels = np.append(labels, tk.Label(frame, text="Transducer frequency (kHz):"))
+        labels[4].pack(pady=0)
+        entries = np.append(entries, tk.Entry(frame, width = 8))
+        entries[0].pack(padx=10, pady=2)
+        entries[0].insert(0, 40.0)
 
-            for i in range(0,8):
-                self.depth1_var[i] = IntVar()
-                self.depth1_ent[i] = Entry(frame, width=2, textvariable = self.depth1_var[i])
+        properties.update({"TransFreq" : entries[0]})
 
-            self.layers1_var = DoubleVar() # Number of layers
-            self.layers1_scale = Scale(frame, from_=1, to=8, tickinterval=1,
-            orient=HORIZONTAL, variable = self.layers1_var, length=250)
+        labels = np.append(labels, tk.Label(frame, text="Number of Layers:"))
+        labels[5].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=1, to=8, tickinterval=1,
+        orient=tk.HORIZONTAL, variable = tk.IntVar(), length=250))
+        scales[4].pack(padx=10, pady=2)
+        scales[4].set(3)
 
-            self.vdisp1_lab = Label(frame, text="Vertical displacement (mm)")
-            self.vdisp1_lab.pack(pady=5)
-            self.vdisp1_var = DoubleVar() # Vertical displacement
-            self.vdisp1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.vdisp1_var, length=250)
-            self.vdisp1_scale.pack(padx=10, pady=2)
+        properties.update({"Layers" : scales[4]})
 
-            self.roc1_lab = Label(frame, text="Radius of curvature (mm)")
-            self.roc1_lab.pack(pady=5)
-            self.rcurv1_var = DoubleVar() # Radius of curvature
-            self.rcurv1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.rcurv1_var, length=250)
-            self.rcurv1_scale.pack(padx=10, pady=2)
+        labels = np.append(labels, tk.Label(frame, text = "Number of transducer per layer:"))
+        labels[6].pack(pady=0)
+        v = [6, 12, 18, 24, 32, 36, 42, 48]
+        for i in range(0,8):
+            entries = np.append(entries, tk.Entry(frame, width=2))
+            entries[1+i].pack(side=tk.LEFT, padx=10, pady=10)
+            entries[1+i].insert(0,v[i])
 
-            self.sock1_lab = Label(frame, text="Socket radius (mm)")
-            self.sock1_lab.pack(pady=5)
-            self.radius1_var = DoubleVar() # Disc radius
-            self.radius1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.radius1_var, length=250)
-            self.radius1_scale.pack(padx=10, pady=2)
+        properties.update({"Depth" : entries[1:]})
 
-        def window3(self, frame):
-            """Frame for bottom component being an array"""
+        return properties, labels, scales, entries
 
-            self.vdisp2_lab = Label(frame, text="Vertical displacement (mm)")
-            self.vdisp2_lab.pack(pady=5)
-            self.vdisp2_var = DoubleVar() # Vertical displacement
-            self.vdisp2_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.vdisp2_var, length=250)
-            self.vdisp2_scale.pack(padx=10, pady=2)
+    def transducer(self, frame):
+        """ Method adds widgets relevant to a transducer """
+        labels, scales, entries = [], [], []
+        properties = {}
 
-            self.roc2_lab = Label(frame, text="Radius of curvature (mm)")
-            self.roc2_lab.pack(pady=5)
-            self.rcurv2_var = DoubleVar() # Radius of curvature
-            self.rcurv2_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.rcurv2_var, length=250)
-            self.rcurv2_scale.pack(padx=10, pady=2)
+        labels = np.append(labels, tk.Label(frame, text="Vertical Displacement (mm)"))
+        labels[0].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
+        scales[0].pack(padx=10, pady=2)
+        scales[0].set(68)
 
-            self.layers2_lab = Label(frame, text="Number of layers")
-            self.layers2_lab.pack(pady=5)
-            self.layers2_var = DoubleVar() # Number of layers
-            self.layers2_scale = Scale(frame, from_=1, to=8, tickinterval=1,
-            orient=HORIZONTAL, variable = self.layers2_var, length=250)
-            self.layers2_scale.pack(padx=10, pady=2)
+        properties.update({"Displacement" : scales[0]})
 
-            self.sock2_lab = Label(frame, text="Socket radius (mm)")
-            self.sock2_lab.pack(pady=5)
-            self.radius2_var = DoubleVar() # Disc radius
-            self.radius2_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.radius2_var, length=250)
-            self.radius2_scale.pack(padx=10, pady=2)
+        labels = np.append(labels, tk.Label(frame, text="Radius of Curvature (mm)"))
+        labels[1].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
+        scales[1].pack(padx=10, pady=2)
+        scales[1].set(33)
 
-            self.phase2_lab = Label(frame, text = "Phase shift (degrees)")
-            self.phase2_lab.pack()
-            self.phase2_var = DoubleVar()
-            self.phase2_scale = Scale(frame, from_=0, to=179, tickinterval = 90,
-            orient=HORIZONTAL, variable = self.phase2_var, length=250)
-            self.phase2_scale.pack(padx=10, pady=2)
+        properties.update({"RadiusCurvature" : scales[1]})
 
-            self.transfreq2_lab = Label(frame, text="Transducer frequency (kHz)")
-            self.transfreq2_lab.pack(pady=5)
-            self.transfreq2_var = DoubleVar()
-            self.transfreq2_ent = Entry(frame, width = 8, textvariable = self.transfreq2_var)
-            self.transfreq2_ent.pack(padx=10, pady=2)
+        labels = np.append(labels, tk.Label(frame, text="Socket Radius (mm)"))
+        labels[2].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
+        scales[2].pack(padx=10, pady=2)
+        scales[2].set(35)
 
-            self.depth2_lab = Label(frame, text="Number of transducers per layer")
-            self.depth2_lab.pack(pady=5)
-            self.depth2_var = [0]*8
-            self.depth2_ent = [0]*8
+        properties.update({"Radius" : scales[2]})
 
-            for i in range(0,8):
-                self.depth2_var[i] = IntVar()
-                self.depth2_ent[i] = Entry(frame, width=2, textvariable = self.depth2_var[i])
-                self.depth2_ent[i].pack(side=LEFT, padx=10, pady=10)
+        labels = np.append(labels, tk.Label(frame, text="Phase shift (degrees)"))
+        labels[3].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=179, tickinterval=90,
+        orient=tk.HORIZONTAL, variable = tk.IntVar(), length=250))
+        scales[3].pack(padx=10, pady=2)
 
-        def window4(self, frame):
-            """Frame for bottom component being a reflector"""
+        properties.update({"Phase" : scales[3]})
 
-            self.depth2_var = [0]*8
-            self.depth2_ent = [0]*8
-            self.transfreq2_var = DoubleVar()
-            self.transfreq2_ent = Entry(frame, width = 8, textvariable = self.transfreq2_var)
+        labels = np.append(labels, tk.Label(frame, text="Transducer frequency (kHz):"))
+        labels[4].pack(pady=0)
+        entries = np.append(entries, tk.Entry(frame, width = 8))
+        entries[0].pack(padx=10, pady=2)
+        entries[0].insert(0,40.0)
+        properties.update({"TransFreq" : entries[0]})
 
-            for i in range(0,8):
-                self.depth2_var[i] = IntVar()
-                self.depth2_ent[i] = Entry(frame, width=2, textvariable = self.depth2_var[i])
+        return properties, labels, scales, entries
 
-            self.layers2_var = DoubleVar() # Number of layers
-            self.layers2_scale = Scale(frame, from_=1, to=8, tickinterval=1,
-            orient=HORIZONTAL, variable = self.layers2_var, length=250)
+    def reflector(self, frame):
+        """ Method adds widgets relevant to a reflector """
+        labels, scales, entries = [], [], []
+        properties = {}
 
-            self.vdisp2_lab = Label(frame, text="Vertical displacement")
-            self.vdisp2_lab.pack(pady=5)
-            self.vdisp2_var = DoubleVar() # Vertical displacement
-            self.vdisp2_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.vdisp2_var, length=250)
-            self.vdisp2_scale.pack()
+        labels = np.append(labels, tk.Label(frame, text="Vertical Displacement (mm)"))
+        labels[0].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
+        scales[0].pack(padx=10, pady=2)
+        scales[0].set(68)
 
-            self.roc2_lab = Label(frame, text="Radius of curvature")
-            self.roc2_lab.pack(pady=5)
-            self.rcurv2_var = DoubleVar() # Radius of curvature
-            self.rcurv2_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.rcurv2_var, length=250)
-            self.rcurv2_scale.pack()
+        properties.update({"Displacement" : scales[0]})
 
-            self.sock2_lab = Label(frame, text="Socket radius")
-            self.sock2_lab.pack(pady=5)
-            self.radius2_var = DoubleVar() # Disc radius
-            self.radius2_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.radius2_var, length=250)
-            self.radius2_scale.pack()
+        labels = np.append(labels, tk.Label(frame, text="Radius of Curvature (mm)"))
+        labels[1].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
+        scales[1].pack(padx=10, pady=2)
+        scales[1].set(33)
 
-        def window5(self,frame):
-            """Top single transducer"""
+        properties.update({"RadiusCurvature" : scales[1]})
 
-            self.vdisp1_lab = Label(frame, text="Vertical displacement (mm)")
-            self.vdisp1_lab.pack(pady=5)
-            self.vdisp1_var = DoubleVar() # Vertical displacement
-            self.vdisp1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.vdisp1_var, length=250)
-            self.vdisp1_scale.pack(padx=10, pady=2)
+        labels = np.append(labels, tk.Label(frame, text="Socket Radius (mm)"))
+        labels[2].pack(pady=0)
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
+        scales[2].pack(padx=10, pady=2)
+        scales[2].set(30)
 
-            self.roc1_lab = Label(frame, text="Radius of Curvature (mm)")
-            self.roc1_lab.pack(pady=5)
-            self.rcurv1_var = DoubleVar() # Radius of curvature
-            self.rcurv1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.rcurv1_var, length=250)
-            self.rcurv1_scale.pack(padx=10, pady=2)
+        properties.update({"Radius" : scales[2]})
 
-            self.sock1_lab = Label(frame, text="Socket radius (mm)")
-            self.sock1_lab.pack(pady=5)
-            self.radius1_var = DoubleVar() # Disc radius
-            self.radius1_scale = Scale(frame, from_=0, to=100, tickinterval=50,
-            orient=HORIZONTAL, variable = self.radius1_var, length=250)
-            self.radius1_scale.pack(padx=10, pady=2)
+        return properties, labels, scales, entries
 
-            self.phase1_lab = Label(frame, text = "Phase shift (degrees)")
-            self.phase1_lab.pack(pady=5)
-            self.phase1_var = DoubleVar()
-            self.phase1_scale = Scale(frame, from_=0, to=179, tickinterval = 90,
-            orient=HORIZONTAL, variable = self.phase1_var, length=250)
-            self.phase1_scale.pack(padx=10, pady=2)
+def definedicts(page_inst, masterframe_inst):
+    c = float(masterframe_inst.medium_c.get())
+    rho = float(masterframe_inst.medium_density.get())
+    medium_properties = {"Density": rho, "SpeedOfSound": c}
+    top_properties = {"Orientation":1, "Type": masterframe_inst.top_selection.get()}
+    bot_properties = {"Orientation":-1, "Type":masterframe_inst.bot_selection.get()}
 
-            self.transfreq1_lab = Label(frame, text="Transducer frequency (kHz):")
-            self.transfreq1_lab.pack(pady=5)
-            self.transfreq1_var = DoubleVar()
-            self.transfreq1_ent = Entry(frame, width = 8, textvariable = self.transfreq1_var)
-            self.transfreq1_ent.pack(padx=10, pady=2)
+    for key in page_inst.properties_page1:
+        if key != "Depth":
+            top_properties.update({key : page_inst.properties_page1[key].get()})
+            if key in ["Displacement", "RadiusCurvature", "Radius"]:
+                top_properties[key] = float(top_properties[key])*1e-3
+            if key == "TransFreq":
+                top_properties[key] = float(top_properties[key])*1e3
+            if key == "Layers":
+                top_properties[key] = int(top_properties[key])
 
-        def show1(none=0):
-            """function which destroys old frame widgets and calls function to open new frame"""
-            if hasattr(self, 'vdisp1_scale'):
-                self.vdisp1_scale.destroy()
-                self.rcurv1_scale.destroy()
-                self.vdisp1_lab.destroy()
-                self.roc1_lab.destroy()
+        else:
+            v = []
+            for item in page_inst.properties_page1[key]:
+                v = np.append(v, int(item.get()))
+            top_properties.update({key : v})
 
-            if hasattr(self, 'layers1_scale'):
-                self.layers1_scale.destroy()
-            if hasattr(self, 'layers1_lab'):
-                self.layers1_lab.destroy()
+    for key in page_inst.properties_page2:
+        if key != "Depth":
+            bot_properties.update({key : page_inst.properties_page2[key].get()})
+            if key in ["Displacement", "RadiusCurvature", "Radius"]:
+                bot_properties[key] = float(bot_properties[key])*1e-3
+            if key == "TransFreq":
+                bot_properties[key] = float(bot_properties[key])*1e3
+            if key == "Layers":
+                bot_properties[key] = int(bot_properties[key])
+        else:
+            v = []
+            for item in page_inst.properties_page2[key]:
+                v = np.append(v, int(item.get()))
+            bot_properties.update({key : v})
 
-            if hasattr(self, 'radius1_scale'):
-                self.radius1_scale.destroy()
-            if hasattr(self, 'sock1_lab'):
-                self.sock1_lab.destroy()
+    return bot_properties, top_properties, medium_properties
 
-            if hasattr(self, 'depth1_lab'):
-                self.depth1_lab.destroy()
-                for i in range(0,8):
-                    self.depth1_ent[i].destroy()
 
-            if hasattr(self, 'transfreq1_ent'):
-                self.transfreq1_ent.destroy()
-            if hasattr(self, 'transfreq1_lab'):
-                self.transfreq1_lab.destroy()
+class Pager:
+    def __init__(self):
+        self.labels_page1 = []
+        self.labels_page2 = []
+        self.properties_page1 = []
+        self.properties_page2 = []
+        self.scales_page1 = []
+        self.scales_page2 = []
+        self.entries_page1 = []
+        self.entries_page2 = []
 
-            if hasattr(self, 'phase1_lab'):
-                self.phase1_lab.destroy()
-            if hasattr(self, 'phase1_scale'):
-                self.phase1_scale.destroy()
+    def toggle_page1(self, selection, frame):
+        type = types()
 
-            checkThisString = self.clicked1.get()
-            if checkThisString == "Array":
-                window1(self,frame)
-            elif checkThisString == "Reflector":
-                window2(self,frame)
-            elif checkThisString == "Transducer":
-                window5(self,frame)
+        if selection.get() == "Transducer":
+            if len(self.labels_page1) > 0:
+                for i in range(len(self.labels_page1)):
+                    self.labels_page1[i].destroy()
+                for i in range(len(self.scales_page1)):
+                    self.scales_page1[i].destroy()
+                for i in range(len(self.entries_page1)):
+                    self.entries_page1[i].destroy()
 
-        def show2(none=0):
-            """function which destroys old frame widgets and calls function to open new frame"""
+            self.properties_page1, self.labels_page1, self.scales_page1, self.entries_page1 = type.transducer(frame)
 
-            if hasattr(self, 'vdisp2_scale'):
-                self.vdisp2_scale.destroy()
-                self.rcurv2_scale.destroy()
-                self.vdisp2_lab.destroy()
-                self.roc2_lab.destroy()
+        if selection.get() == "Array":
+            if len(self.labels_page1) > 0:
+                for i in range(len(self.labels_page1)):
+                    self.labels_page1[i].destroy()
+                for i in range(len(self.scales_page1)):
+                    self.scales_page1[i].destroy()
+                for i in range(len(self.entries_page1)):
+                    self.entries_page1[i].destroy()
 
-            if hasattr(self, 'layers2_scale'):
-                self.layers2_scale.destroy()
-            if hasattr(self, 'layers2_lab'):
-                self.layers2_lab.destroy()
+            self.properties_page1, self.labels_page1, self.scales_page1, self.entries_page1 = type.array(frame)
 
-            if hasattr(self, 'radius2_scale'):
-                self.radius2_scale.destroy()
-            if hasattr(self, 'sock2_lab'):
-                self.sock2_lab.destroy()
+    def toggle_page2(self, selection, frame):
+        type = types()
+        if selection.get() == "Reflector":
+            if len(self.labels_page2) > 0:
+                for i in range(len(self.labels_page2)):
+                    self.labels_page2[i].destroy()
+                for i in range(len(self.scales_page2)):
+                    self.scales_page2[i].destroy()
+                for i in range(len(self.entries_page2)):
+                    self.entries_page2[i].destroy()
 
-            if hasattr(self, 'depth2_lab'):
-                self.depth2_lab.destroy()
-                for i in range(0,8):
-                    self.depth2_ent[i].destroy()
+            self.properties_page2, self.labels_page2, self.scales_page2, self.entries_page2 = type.reflector(frame)
 
-            if hasattr(self, 'transfreq2_ent'):
-                self.transfreq2_ent.destroy()
-            if hasattr(self, 'transfreq2_lab'):
-                self.transfreq2_lab.destroy()
+        if selection.get() == "Array":
+            if len(self.labels_page2) > 0:
+                for i in range(len(self.labels_page2)):
+                    self.labels_page2[i].destroy()
+                for i in range(len(self.scales_page2)):
+                    self.scales_page2[i].destroy()
+                for i in range(len(self.entries_page2)):
+                    self.entries_page2[i].destroy()
 
-            if hasattr(self, 'phase2_lab'):
-                self.phase2_lab.destroy()
-            if hasattr(self, 'phase2_scale'):
-                self.phase2_scale.destroy()
+            self.properties_page2, self.labels_page2, self.scales_page2, self.entries_page2 = type.array(frame)
 
-            checkThisString = self.clicked2.get()
-            if checkThisString == "Array":
-                window3(self,frame2)
-            elif checkThisString == "Reflector":
-                window4(self,frame2)
 
-        def render(self):
-            """Function organizes input from widgets and plots the geometry"""
-            def properties_fix(properties):
-                if properties["Type"] == "Reflector":
-                    properties["Layers"] = 0
-                    properties["Depth"] = [0, 0, 0, 0, 0, 0, 0, 0]
-                    properties["TransFreq"] = 0
-                    properties["Amplitude"] = 0
-                    properties["TransRadius"] = 0
+    def compute_potential(self, masterframe_inst):
+        top_selection = masterframe_inst.top_selection
+        bot_selection = masterframe_inst.bot_selection
 
-                properties_fixed = properties
-                return properties_fixed
-
-            if self.clicked1.get() == "Array":
-                zPosProperties = {
-                                "Orientation": 1,
-                                "Type": self.clicked1.get(),
-                                "Phase": self.phase1_scale.get(),
-                                "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
-                                "Layers": self.layers1_scale.get(),
-                                "Depth": [int(self.depth1_ent[0].get()), int(self.depth1_ent[1].get()), int(self.depth1_ent[2].get()), int(self.depth1_ent[3].get()), int(self.depth1_ent[4].get()), int(self.depth1_ent[5].get()),
-                                int(self.depth1_ent[6].get()), int(self.depth1_ent[7].get())],
-                                "Radius": self.radius1_scale.get()*1e-3,
-                                "TransFreq": float(self.transfreq1_ent.get())*1e3,
-                                "Amplitude": 1e-6,
-                                "Displacement": self.vdisp1_scale.get()*1e-3,
-                                "TransRadius": 4.5e-3
-                }
-            elif self.clicked1.get() == "Transducer":
-                zPosProperties = {
-                                "Orientation": 1,
-                                "Type": self.clicked1.get(),
-                                "Phase": self.phase1_scale.get(),
-                                "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
-                                "Layers": 0,
-                                "Depth": [0,0,0,0,0,0,0,0],
-                                "Radius": self.radius1_scale.get()*1e-3,
-                                "TransFreq": float(self.transfreq1_ent.get())*1e3,
-                                "Amplitude": 1e-6,
-                                "Displacement": self.vdisp1_scale.get()*1e-3,
-                                "TransRadius": 4.5e-3
-                }
-            if self.clicked2.get() == "Array":
-                zNegProperties = {
-                                "Orientation": -1,
-                                "Type": self.clicked2.get(),
-                                "Phase": self.phase2_scale.get(),
-                                "RadiusCurvature": self.rcurv2_scale.get()*1e-3,
-                                "Layers": self.layers2_scale.get(),
-                                "Depth": [int(self.depth2_ent[0].get()), int(self.depth2_ent[1].get()), int(self.depth2_ent[2].get()), int(self.depth2_ent[3].get()), int(self.depth2_ent[4].get()), int(self.depth2_ent[5].get()),
-                                int(self.depth2_ent[6].get()), int(self.depth2_ent[7].get())],
-                                "Radius": self.radius2_scale.get()*1e-3,
-                                "TransFreq": float(self.transfreq2_ent.get())*1e3,
-                                "Amplitude": 1e-6,
-                                "Displacement": self.vdisp2_scale.get()*1e-3,
-                                "TransRadius": 4.5e-3
-                }
-            elif self.clicked2.get() == "Reflector":
-                zNegProperties = {
-                                "Orientation": -1,
-                                "Type": self.clicked2.get(),
-                                "Phase": 0,
-                                "RadiusCurvature": self.rcurv2_scale.get()*1e-3,
-                                "Layers": 0,
-                                "Depth": [0,0,0,0,0,0,0,0],
-                                "Radius": self.radius2_scale.get()*1e-3,
-                                "TransFreq": float(self.transfreq2_ent.get())*1e3,
-                                "Amplitude": 1e-6,
-                                "Displacement": self.vdisp2_scale.get()*1e-3,
-                                "TransRadius": 4.5e-3
-                }
-
-            Ux, Uy, Uz, Vx, Vy, Vz = CreateGeometry(zPosProperties, zNegProperties)
-
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            ax.scatter3D(Vx, Vy, Vz, marker='.')
-            ax.scatter3D(Ux, Uy, Uz, marker='.')
-            ax.set_xlim([-0.05,0.05])
-            ax.set_ylim([-0.05,0.05])
-            ax.set_zlim([-0.065,0.065])
-            plt.show()
-
-        def compute(self):
-            """Calls function to run computations and plots result"""
-
-            mediumProperties = {"Density": 1.2, "SpeedOfSound": 343}
-            if self.clicked1.get() == "Array":
-                zPosProperties = {
-                                "Orientation": 1,
-                                "Type": self.clicked1.get(),
-                                "Phase": self.phase1_scale.get(),
-                                "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
-                                "Layers": self.layers1_scale.get(),
-                                "Depth": [int(self.depth1_ent[0].get()), int(self.depth1_ent[1].get()), int(self.depth1_ent[2].get()), int(self.depth1_ent[3].get()), int(self.depth1_ent[4].get()), int(self.depth1_ent[5].get()),
-                                int(self.depth1_ent[6].get()), int(self.depth1_ent[7].get())],
-                                "Radius": self.radius1_scale.get()*1e-3,
-                                "TransFreq": float(self.transfreq1_ent.get())*1e3,
-                                "Amplitude": 1e-6,
-                                "Displacement": self.vdisp1_scale.get()*1e-3,
-                                "TransRadius": 4.5e-3
-                }
-            elif self.clicked1.get() == "Transducer":
-                zPosProperties = {
-                                "Orientation": 1,
-                                "Type": self.clicked1.get(),
-                                "Phase": self.phase1_scale.get(),
-                                "RadiusCurvature": self.rcurv1_scale.get()*1e-3,
-                                "Layers": 0,
-                                "Depth": [0,0,0,0,0,0,0,0],
-                                "Radius": self.radius1_scale.get()*1e-3,
-                                "TransFreq": float(self.transfreq1_ent.get())*1e3,
-                                "Amplitude": 1e-6,
-                                "Displacement": self.vdisp1_scale.get()*1e-3,
-                                "TransRadius": 4.5e-3
-                }
-            if self.clicked2.get() == "Array":
-                zNegProperties = {
-                            "Orientation": -1,
-                            "Type": self.clicked2.get(),
-                            "Phase": self.phase2_scale.get(),
-                            "RadiusCurvature": self.rcurv2_scale.get()*1e-3,
-                            "Layers": self.layers2_scale.get(),
-                            "Depth": [int(self.depth2_ent[0].get()), int(self.depth2_ent[1].get()), int(self.depth2_ent[2].get()), int(self.depth2_ent[3].get()), int(self.depth2_ent[4].get()), int(self.depth2_ent[5].get()),
-                            int(self.depth2_ent[6].get()), int(self.depth2_ent[7].get())],
-                            "Radius": self.radius2_scale.get()*1e-3,
-                            "TransFreq": float(self.transfreq2_ent.get())*1e3,
-                            "Amplitude": 1e-6,
-                            "Displacement": self.vdisp2_scale.get()*1e-3,
-                            "TransRadius": 4.5e-3}
-            elif self.clicked2.get() == "Reflector":
-                zNegProperties = {
-                            "Orientation": -1,
-                            "Type": self.clicked2.get(),
-                            "Phase": 0,
-                            "RadiusCurvature": self.rcurv2_scale.get()*1e-3,
-                            "Layers": 0,
-                            "Depth": [0,0,0,0,0,0,0,0],
-                            "Radius": self.radius2_scale.get()*1e-3,
-                            "TransFreq": float(self.transfreq2_ent.get())*1e3,
-                            "Amplitude": 1e-6,
-                            "Displacement": self.vdisp2_scale.get()*1e-3,
-                            "TransRadius": 4.5e-3}
+        if top_selection.get() != "Select Type" or bot_selection.get() != "Select Type":
+            bot_properties, top_properties, medium_properties = definedicts(self, masterframe_inst)
 
             start = time.time()
-            relative_potential, pressure, x_span, z_span = MatrixMethod(mediumProperties,zPosProperties,zNegProperties)
+            relative_potential, pressure, x_span, z_span = MatrixMethod(medium_properties,top_properties,bot_properties)
             end = time.time()
             diff = end - start
             print("Total time elapsed was %.4f" % diff, "seconds")
@@ -487,47 +291,109 @@ class masterframe(tk.Tk):
             maxPressure = np.max(_relative_potential)
             minPressure = np.min(_relative_potential)
             fig = plt.figure(figsize=(8, 6), dpi= 80, facecolor='w', edgecolor='k')
-            cs = plt.contourf(_relative_potential, np.linspace(minPotential,maxPotential,1000), cmap='jet', extend='both')
+            cs = plt.contourf(_relative_potential, np.linspace(minPotential,maxPotential,1000), cmap='bone', extend='both')
             plt.colorbar()
             plt.show()
+        else:
+            print("Please define system geometry")
 
-            fig2 = plt.figure(figsize=(8, 6), dpi= 80, facecolor='w', edgecolor='k')
-            cs2 = plt.contourf(_pressure, np.linspace(minPressure,maxPressure,1000), cmap='jet', extend='both')
-            plt.colorbar()
+    def render(self, masterframe_inst):
+
+        if masterframe_inst.top_selection.get() != "Select Type" or masterframe_inst.bot_selection.get() != "Select Type":
+
+            bot_properties, top_properties, medium_properties = definedicts(self, masterframe_inst)
+
+            Ux, Uy, Uz, Vx, Vy, Vz = CreateGeometry(top_properties, bot_properties)
+
+            fig = plt.figure()
+            ax = Axes3D(fig)
+            ax.scatter3D(Vx, Vy, Vz, marker='.')
+            ax.scatter3D(Ux, Uy, Uz, marker='.')
+            ax.set_xlim([-0.05,0.05])
+            ax.set_ylim([-0.05,0.05])
+            ax.set_zlim([-0.065,0.065])
             plt.show()
+        else:
+            print("Please define system geometry")
 
+class masterframe(tk.Tk):
 
+    def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+        self.frames = {}
+        self.drops = {}
+        self.btns = {}
+        self.drop_selections = {}
+
+    def setouterproperties(self):
+        self.geometry("750x800")
+        self.iconbitmap(".\icon.ico")
+        self.title("Simulation Platform for Acoustic Levitation Traps (SALT)")
+
+    def placemainwidgets(self):
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
-        self.geometry("790x800")
-        self.iconbitmap(".\icon.ico")
-        self.title("Simulation Platform for Acoustic Levitation Traps (SALT)")
-        self.frames = {}
+        pager = Pager()
 
-        self.clicked1 = StringVar()
-        self.clicked1.set("Window 1")
-        frame = LabelFrame(self, text="Top component", padx=10, pady=10)
-        frame.pack(padx=10, pady=10)
-        frame.place(x=50, y=0)
-        drop = OptionMenu(frame, self.clicked1, "Array", "Transducer", command=show1)
-        drop.pack()
+        self.top_selection = tk.StringVar()
+        self.top_selection.set("Select Type")
+        self.frames[0] = tk.LabelFrame(self, text="Top component", padx=10, pady=10)
+        self.frames[0].pack(padx=10, pady=10)
+        self.frames[0].place(x=20, y=0)
+        self.drops[0] = tk.OptionMenu(self.frames[0], self.top_selection,
+        "Array", "Transducer", command=lambda x:pager.toggle_page1(self.top_selection, self.frames[0]))
+        self.drops[0].pack()
 
-        self.clicked2 = StringVar()
-        self.clicked2.set("Window 2")
-        frame2 = LabelFrame(self, text="Bottom components", padx=10, pady=10)
-        frame2.pack(padx=10, pady=10)
-        frame2.place(x=420, y=0)
-        drop2 = OptionMenu(frame2, self.clicked2, "Array", "Reflector", command=show2)
-        drop2.pack()
+        self.bot_selection = tk.StringVar()
+        self.bot_selection.set("Select Type")
+        self.frames[1] = tk.LabelFrame(self, text="Bottom components", padx=10, pady=10)
+        self.frames[1].pack(padx=10, pady=10)
+        self.frames[1].place(x=420, y=0)
+        self.drops[1] = tk.OptionMenu(self.frames[1], self.bot_selection,
+        "Array", "Reflector", command=lambda x:pager.toggle_page2(self.bot_selection, self.frames[1]))
+        self.drops[1].pack()
 
-        btn1 = Button(self, text="Display Geometry", command=lambda:render(self))
-        btn1.pack(side=BOTTOM,pady=10)
-        btn2 = Button(self, text="Compute Relative Acoustic Potential", command=lambda:compute(self))
-        btn2.pack(side=BOTTOM,pady=10)
+        self.frames[2] = tk.LabelFrame(self, text="Medium Properties")
+        self.frames[2].pack(padx=5,pady=5,anchor=tk.CENTER)
+
+        sub_frame = tk.LabelFrame(self.frames[2], text="Speed of sound (m/s)")
+
+        self.medium_c = tk.Entry(sub_frame, width=8,justify=tk.CENTER)
+        self.medium_c.insert(0,343)
+        self.medium_c.pack(padx=5,pady=5,side=tk.BOTTOM)
+        sub_frame.pack(side=tk.LEFT)
+
+        sub_frame2 = tk.LabelFrame(self.frames[2], text="Zero-density (kg/m^3)")
+
+        self.medium_density = tk.Entry(sub_frame2, width=8, justify=tk.CENTER)
+        self.medium_density.insert(0,1.2)
+        self.medium_density.pack(padx=5,pady=5,side=tk.BOTTOM)
+        sub_frame2.pack(side=tk.RIGHT)
+
+        self.frames[3] = tk.LabelFrame(self, text="Options", padx=10, pady=10)
+        self.frames[3].pack(padx=10,pady=10,side=tk.BOTTOM)
+
+
+        self.btns[0] = tk.Button(self.frames[3], text="Display Geometry",
+        command=lambda:pager.render(self))
+        self.btns[0].pack(pady=10, padx =5, side=tk.LEFT)
+
+        self.btns[1] = tk.Button(self.frames[3], text="Compute Relative Acoustic Potential",
+        command=lambda:pager.compute_potential(self))
+        self.btns[1].pack(pady=10, padx = 5, side=tk.LEFT)
+
+        # self.btns[2] = tk.Button(self.frames[3], text="Compute Pressure",
+        # command=lambda:pager.compute_pressure(self))
+        # self.btns[2].pack(pady=10, padx = 5, side=tk.LEFT)
+        #
+        # self.btns[3] = tk.Button(self.frames[3], text="Animate Phase Shift",
+        # command=lambda:pager.animate(self))
+        # self.btns[3].pack(pady=10, padx = 5, side=tk.LEFT)
 
 root = masterframe()
+root.setouterproperties()
+root.placemainwidgets()
 root.mainloop()

@@ -1,10 +1,12 @@
-import time, os
+import time, os, sys
 try:
     import numpy as np
 except:
     os.system("pip install numpy")
     import numpy as np
+
 def CreateTransducer(properties):
+    """ Method for constructing a single transducer """
     R = properties["Radius"]*1e3
     r_c = properties["RadiusCurvature"]
     s = properties["Orientation"]
@@ -50,7 +52,8 @@ def CreateTransducer(properties):
     return Vx, Vy, Vz
 
 def CreateArray(properties):
-    transducer_radius = properties["TransRadius"]
+    """ Method for constructing an array of transducers """
+    transducer_radius = 4.5*1e-3
     transducer_per_layer = properties["Depth"]
     layers = properties["Layers"]
     socket_radius = properties["Radius"]
@@ -68,10 +71,10 @@ def CreateArray(properties):
     Vy = []
 
     for kk in range(layers):
-        n = transducer_per_layer[kk]
+        n = int(transducer_per_layer[kk])
         beta = np.linspace(2*np.pi/n, 2*np.pi, n)
 
-        for ii in range(transducer_per_layer[kk]):
+        for ii in range(n):
             C = np.sqrt((X - 0.5*r[kk]*np.cos(beta[ii]))**2 + (Y - 0.5*r[kk]*np.sin(beta[ii]))**2) <= transducer_radius
             vec1 = X[C]
             vec2 = Y[C]
@@ -96,23 +99,23 @@ def CreateArray(properties):
     return Vx, Vy, Vz
 
 def CreateReflector(properties):
-
+    """ Method for constructing a reflector """
     R = properties["Radius"]*1e3
     r_c = properties["RadiusCurvature"]
     s = properties["Orientation"]
     d = properties["Displacement"]
     z0 = s*d
 
-    R_span = np.arange(-R*1e-3,R*1e-3+1e-3,1e-3)
+    R_span = np.arange(-R*1e-3,R*1e-3,1e-3)
     R_length = len(R_span)
 
-    X, Y = np.mgrid[-R:R+1, -R:R+1]
+    X, Y = np.mgrid[-R:R, -R:R]
     X = X*1e-3
     Y = Y*1e-3
     Z = np.zeros([R_length, R_length])
 
     rows, cols = np.mgrid[0:R_length, 0:R_length]
-    C = np.sqrt((rows-R-1)**2 + (cols-R-1)**2)<=R
+    C = np.sqrt((rows-R)**2 + (cols-R)**2)<R
 
     Vx = X[C]
     Vy = Y[C]
@@ -133,6 +136,7 @@ def CreateReflector(properties):
         Vx = np.delete(Vx,np.argwhere(np.isnan(S)))
         Vy = np.delete(Vy,np.argwhere(np.isnan(S)))
         Vz = np.delete(Vz,np.argwhere(np.isnan(S)))
+
     Vx = Vx.reshape([len(Vx),1])
     Vy = Vy.reshape([len(Vy),1])
     Vz = Vz.reshape([len(Vz),1])
@@ -165,7 +169,6 @@ def CreateMedium(Vx,Vz,Ux,Uz):
 
     return Mx, My, Mz, x_span, z_span
 
-### NOTE: Functions TransferMatrices and DistanceMatrices aren't being used, see m-files
 def DistanceMatrices(Vx, Vy, Vz, Ux, Uy, Uz, Mx, My, Mz):
     """Function computes the distance between measurement plane and components"""
     nT = len(Vx)
@@ -194,28 +197,31 @@ def DistanceMatrices(Vx, Vy, Vz, Ux, Uy, Uz, Mx, My, Mz):
 
     r_im = np.sqrt((Bx-Ax)**2 + (By-Ay)**2 + (Bz-Az)**2)
 
-    Ax = np.repeat(Ux.reshape(nR,1), nT, 1)
-    Bx = np.repeat(Vx, nR, 0).reshape(nR, nT)
+    Ax = np.repeat(Ux, nT, 1)
+    Bx = np.repeat(Vx.T, nR, 0)
 
-    Ay = np.repeat(Uy.reshape(nR,1), nT, 1)
-    By = np.repeat(Vy, nR, 0).reshape(nR, nT)
+    Ay = np.repeat(Uy, nT, 1)
+    By = np.repeat(Vy.T, nR, 0)
 
-    Az = np.repeat(Uz.reshape(nR,1), nT, 1)
-    Bz = np.repeat(Vz, nR, 0).reshape(nR, nT)
+    Az = np.repeat(Uz, nT, 1)
+    Bz = np.repeat(Vz.T, nR, 0)
 
-    r_in = np.sqrt((Bx-Ax)**2 + (By-Ay)**2 + (Bz-Az)**2).T
+    r_in = np.sqrt((Bx-Ax)**2 + (By-Ay)**2 + (Bz-Az)**2)
     r_ni = r_in.T
 
     return r_nm, r_im, r_in, r_ni
 
 def TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_im, r_in, r_ni):
-
+    """ Method for computing transfer matrices """
     Sn = 1e-6
     Si = 1e-6
 
     c = mediumProperties["SpeedOfSound"]
     f1 = zPosProperties["TransFreq"]
-    f2 = zNegProperties["TransFreq"]
+    try:
+        f2 = zNegProperties["TransFreq"]
+    except:
+        f2 = 0
 
     if f1 != 0:
         wL1 = c/f1
@@ -251,15 +257,20 @@ def TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_i
         T_RM = Sn*np.exp(-1j*kk1*r_im)/(r_im)
         T_TM = Si*np.exp(-1j*kk1*r_nm)/(r_nm)
 
-    return T_RT, T_TR, T_RM, T_TM
+    return T_TR, T_RT, T_RM, T_TM
 
 def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProperties,nT,nR,nM):
-
+    """ Method computes pressure matrix in accordance with the matrix method """
     t = 0
     f1 = zPosProperties["TransFreq"]
-    f2 = zNegProperties["TransFreq"]
-    d1 = zPosProperties["Amplitude"]
-    d2 = zNegProperties["Amplitude"]
+
+    try:
+        f2 = zNegProperties["TransFreq"]
+    except:
+        f2 = 0
+
+    d1 = 1e-6
+    d2 = 1e-6
 
     rho = mediumProperties["Density"]
     c = mediumProperties["SpeedOfSound"]
@@ -315,6 +326,7 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
     return P
 
 def ComputeRelativePotential(Ptotal, mediumProperties, zPosProperties, zNegProperties):
+    """ Method computes the relative acoustic potential """
     c = mediumProperties["SpeedOfSound"]
     rho = mediumProperties["Density"]
     f = zPosProperties["TransFreq"]
@@ -333,7 +345,6 @@ def ComputeRelativePotential(Ptotal, mediumProperties, zPosProperties, zNegPrope
     return potential
 
 def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
-
 
     if zPosProperties["Type"] == "Array":
         print("Creating array...")
@@ -391,7 +402,7 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
 
     print("Computing transfer matrices...")
     start = time.time()
-    T_RT, T_TR, T_RM, T_TM = TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_im, r_in, r_ni)
+    T_TR, T_RT, T_RM, T_TM = TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_im, r_in, r_ni)
     end = time.time()
     diff5 = end - start
     print("Computing transfer matrices took %.6f" % diff5, "seconds")
@@ -416,60 +427,6 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
     end = time.time()
     diff7 = end - start
     print("Computing relative acoustic potential took %.6f" % diff7, "seconds")
-
-    return relative_potential, pressure, x_span, z_span
-
-def mainMatrixMethod(orientation1, type1, shape1, rcurve1, layers1, depth01,
-depth02, depth03, depth04, depth05, depth06, depth07, depth08, radius1, transfreq1,
-amplitude1, displacement1, transradius1, phase1, orientation2, type2, shape2, rcurve2,
-layers2, depth11, depth12, depth13, depth14, depth15, depth16, depth17, depth18, radius2,
-transfreq2, amplitude2, displacement2, transradius2, phase2):
-
-    def properties_fix(properties):
-
-        if properties["Type"] == "Reflector":
-            properties["Layers"] = 0
-            properties["Depth"] = [0, 0, 0, 0, 0, 0, 0]
-            properties["TransFreq"] = 0
-            properties["Amplitude"] = 0
-            properties["TransRadius"] = 0
-
-        properties_fixed = properties
-        return properties_fixed
-    mediumProperties = {"Density": 1.2, "SpeedOfSound": 343}
-
-    zPosProperties = {
-                    "Orientation": orientation1,
-                    "Type": type1,
-                    "Phase": phase1,
-                    "RadiusCurvature": rcurve1,
-                    "Layers": layers1,
-                    "Depth": [depth01, depth02, depth03, depth04, depth05, depth06, depth07, depth08],
-                    "Radius": radius1,
-                    "TransFreq": transfreq1,
-                    "Amplitude": amplitude1,
-                    "Displacement": displacement1,
-                    "TransRadius": transradius1
-    }
-
-    zNegProperties = {
-                    "Orientation": orientation2,
-                    "Type": type2,
-                    "Phase": phase2,
-                    "RadiusCurvature": rcurve2,
-                    "Layers": layers2,
-                    "Depth": [depth11, depth12, depth13, depth14, depth15, depth16, depth17, depth18],
-                    "Radius": radius2,
-                    "TransFreq": transfreq2,
-                    "Amplitude": amplitude2,
-                    "Displacement": displacement2,
-                    "TransRadius": transradius2
-    }
-
-    zNegProperties = properties_fix(zNegProperties)
-    zPosProperties = properties_fix(zPosProperties)
-
-    relative_potential, pressure, x_span, z_span = MatrixMethod(mediumProperties, zPosProperties, zNegProperties)
 
     return relative_potential, pressure, x_span, z_span
 
