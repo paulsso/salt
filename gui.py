@@ -15,11 +15,64 @@ except:
 from MatrixMethod import MatrixMethod, CreateGeometry
 from mpl_toolkits.mplot3d import axes3d, Axes3D
 
+def definedicts(page_inst, masterframe_inst):
+    c = float(masterframe_inst.medium_c.get())
+    rho = float(masterframe_inst.medium_density.get())
+
+    medium_properties = {"Density": rho, "SpeedOfSound": c}
+
+    top_properties = {"Orientation":1,
+    "Type": masterframe_inst.top_selection.get(),
+    "Concave":page_inst.properties_page1["Concave"].get()}
+
+    bot_properties = {"Orientation":-1,
+    "Type":masterframe_inst.bot_selection.get(),
+    "Concave":page_inst.properties_page2["Concave"].get()}
+
+    for key in page_inst.properties_page1:
+        if key != "Depth":
+            top_properties.update({key : page_inst.properties_page1[key].get()})
+            if key in ["Displacement", "RadiusCurvature", "Radius"]:
+                top_properties[key] = float(top_properties[key])*1e-3
+            if key == "TransFreq":
+                top_properties[key] = float(top_properties[key])*1e3
+            if key == "Layers":
+                top_properties[key] = int(top_properties[key])
+
+        else:
+            v = []
+            for item in page_inst.properties_page1[key]:
+                v = np.append(v, int(item.get()))
+            top_properties.update({key : v})
+
+    for key in page_inst.properties_page2:
+        if key != "Depth":
+            bot_properties.update({key : page_inst.properties_page2[key].get()})
+            if key in ["Displacement", "RadiusCurvature", "Radius"]:
+                bot_properties[key] = float(bot_properties[key])*1e-3
+            if key == "TransFreq":
+                bot_properties[key] = float(bot_properties[key])*1e3
+            if key == "Layers":
+                bot_properties[key] = int(bot_properties[key])
+        else:
+            v = []
+            for item in page_inst.properties_page2[key]:
+                v = np.append(v, int(item.get()))
+            bot_properties.update({key : v})
+
+    return bot_properties, top_properties, medium_properties
+
 class types:
     def array(self, frame):
         """ Method adds widgets relevant to an array of transducers """
         labels, scales, entries = [], [], []
         properties = {}
+
+        var_checkbox = tk.BooleanVar()
+        checkbox = tk.Checkbutton(frame, text="Concave", variable=var_checkbox, onvalue=True, offvalue=False)
+        checkbox.pack(pady=10)
+
+        properties.update({"Concave" : var_checkbox})
 
         labels = np.append(labels, tk.Label(frame, text="Vertical Displacement (mm)"))
         labels[0].pack(pady=0)
@@ -83,12 +136,18 @@ class types:
 
         properties.update({"Depth" : entries[1:]})
 
-        return properties, labels, scales, entries
+        return properties, labels, scales, entries, checkbox
 
     def transducer(self, frame):
         """ Method adds widgets relevant to a transducer """
         labels, scales, entries = [], [], []
         properties = {}
+
+        var_checkbox = tk.BooleanVar()
+        checkbox = tk.Checkbutton(frame, text="Concave", variable=var_checkbox, onvalue=True, offvalue=False)
+        checkbox.pack(pady=10)
+
+        properties.update({"Concave" : var_checkbox})
 
         labels = np.append(labels, tk.Label(frame, text="Vertical Displacement (mm)"))
         labels[0].pack(pady=0)
@@ -132,12 +191,18 @@ class types:
         entries[0].insert(0,40.0)
         properties.update({"TransFreq" : entries[0]})
 
-        return properties, labels, scales, entries
+        return properties, labels, scales, entries, checkbox
 
     def reflector(self, frame):
         """ Method adds widgets relevant to a reflector """
         labels, scales, entries = [], [], []
         properties = {}
+
+        var_checkbox = tk.BooleanVar()
+        checkbox = tk.Checkbutton(frame, text="Concave", variable=var_checkbox, onvalue=True, offvalue=False)
+        checkbox.pack(pady=10)
+
+        properties.update({"Concave" : var_checkbox})
 
         labels = np.append(labels, tk.Label(frame, text="Vertical Displacement (mm)"))
         labels[0].pack(pady=0)
@@ -166,48 +231,7 @@ class types:
 
         properties.update({"Radius" : scales[2]})
 
-        return properties, labels, scales, entries
-
-def definedicts(page_inst, masterframe_inst):
-    c = float(masterframe_inst.medium_c.get())
-    rho = float(masterframe_inst.medium_density.get())
-    medium_properties = {"Density": rho, "SpeedOfSound": c}
-    top_properties = {"Orientation":1, "Type": masterframe_inst.top_selection.get()}
-    bot_properties = {"Orientation":-1, "Type":masterframe_inst.bot_selection.get()}
-
-    for key in page_inst.properties_page1:
-        if key != "Depth":
-            top_properties.update({key : page_inst.properties_page1[key].get()})
-            if key in ["Displacement", "RadiusCurvature", "Radius"]:
-                top_properties[key] = float(top_properties[key])*1e-3
-            if key == "TransFreq":
-                top_properties[key] = float(top_properties[key])*1e3
-            if key == "Layers":
-                top_properties[key] = int(top_properties[key])
-
-        else:
-            v = []
-            for item in page_inst.properties_page1[key]:
-                v = np.append(v, int(item.get()))
-            top_properties.update({key : v})
-
-    for key in page_inst.properties_page2:
-        if key != "Depth":
-            bot_properties.update({key : page_inst.properties_page2[key].get()})
-            if key in ["Displacement", "RadiusCurvature", "Radius"]:
-                bot_properties[key] = float(bot_properties[key])*1e-3
-            if key == "TransFreq":
-                bot_properties[key] = float(bot_properties[key])*1e3
-            if key == "Layers":
-                bot_properties[key] = int(bot_properties[key])
-        else:
-            v = []
-            for item in page_inst.properties_page2[key]:
-                v = np.append(v, int(item.get()))
-            bot_properties.update({key : v})
-
-    return bot_properties, top_properties, medium_properties
-
+        return properties, labels, scales, entries, checkbox
 
 class Pager:
     def __init__(self):
@@ -231,8 +255,9 @@ class Pager:
                     self.scales_page1[i].destroy()
                 for i in range(len(self.entries_page1)):
                     self.entries_page1[i].destroy()
+                self.checkbox_page1.destroy()
 
-            self.properties_page1, self.labels_page1, self.scales_page1, self.entries_page1 = type.transducer(frame)
+            self.properties_page1, self.labels_page1, self.scales_page1, self.entries_page1, self.checkbox_page1 = type.transducer(frame)
 
         if selection.get() == "Array":
             if len(self.labels_page1) > 0:
@@ -242,8 +267,9 @@ class Pager:
                     self.scales_page1[i].destroy()
                 for i in range(len(self.entries_page1)):
                     self.entries_page1[i].destroy()
+                self.checkbox_page1.destroy()
 
-            self.properties_page1, self.labels_page1, self.scales_page1, self.entries_page1 = type.array(frame)
+            self.properties_page1, self.labels_page1, self.scales_page1, self.entries_page1, self.checkbox_page1 = type.array(frame)
 
     def toggle_page2(self, selection, frame):
         type = types()
@@ -255,8 +281,9 @@ class Pager:
                     self.scales_page2[i].destroy()
                 for i in range(len(self.entries_page2)):
                     self.entries_page2[i].destroy()
+                self.checkbox_page2.destroy()
 
-            self.properties_page2, self.labels_page2, self.scales_page2, self.entries_page2 = type.reflector(frame)
+            self.properties_page2, self.labels_page2, self.scales_page2, self.entries_page2, self.checkbox_page2 = type.reflector(frame)
 
         if selection.get() == "Array":
             if len(self.labels_page2) > 0:
@@ -266,8 +293,9 @@ class Pager:
                     self.scales_page2[i].destroy()
                 for i in range(len(self.entries_page2)):
                     self.entries_page2[i].destroy()
+                self.checkbox_page2.destroy()
 
-            self.properties_page2, self.labels_page2, self.scales_page2, self.entries_page2 = type.array(frame)
+            self.properties_page2, self.labels_page2, self.scales_page2, self.entries_page2, self.checkbox_page2 = type.array(frame)
 
 
     def compute_potential(self, masterframe_inst):
@@ -326,7 +354,7 @@ class masterframe(tk.Tk):
         self.drop_selections = {}
 
     def setouterproperties(self):
-        self.geometry("750x800")
+        self.geometry("750x850")
         self.iconbitmap(".\icon.ico")
         self.title("Simulation Platform for Acoustic Levitation Traps (SALT)")
 

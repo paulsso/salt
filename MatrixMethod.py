@@ -24,12 +24,20 @@ def CreateTransducer(properties):
     Vx = X[C]
     Vy = Y[C]
 
-    if s == -1:
-        Vz = z0 - np.sqrt(r_c**2 - (Vx)**2 - (Vy)**2) + r_c
-    elif s == 1:
-        Vz = z0 + np.sqrt(r_c**2 - (Vx)**2 - (Vy)**2) - r_c
-    else:
-        Vz = 0
+    if properties["Concave"]:
+        if s == -1:
+            Vz = z0 - np.sqrt(r_c**2 - (Vx)**2 - (Vy)**2) + r_c
+        elif s == 1:
+            Vz = z0 + np.sqrt(r_c**2 - (Vx)**2 - (Vy)**2) - r_c
+        else:
+            Vz = 0
+    elif not properties["Concave"]:
+        if s == -1:
+            Vz = z0*np.ones([len(Vx),1])
+        elif s == 1:
+            Vz = z0*np.ones([len(Vx),1])
+        else:
+            Vz = 0
 
     Vx = Vx.reshape([len(Vx),1])
     Vy = Vy.reshape([len(Vy),1])
@@ -77,7 +85,10 @@ def CreateArray(properties):
             Vx = np.append(Vx, vec1)
             Vy = np.append(Vy, vec2)
 
-        Vz = tz0 + s*np.sqrt(r_c**2 - np.power(Vx,2) - np.power(Vy,2))
+        if properties["Concave"]:
+            Vz = tz0 + s*np.sqrt(r_c**2 - np.power(Vx,2) - np.power(Vy,2))
+        elif not properties["Concave"]:
+            Vz = s*h*np.ones([len(Vx),1])
 
     Vx = Vx.reshape([len(Vx),1])
     Vy = Vy.reshape([len(Vy),1])
@@ -115,13 +126,21 @@ def CreateReflector(properties):
 
     Vx = X[C]
     Vy = Y[C]
+    if properties["Concave"]:
+        if s == -1:
+            Vz = z0 - np.sqrt(r_c**2 - (Vx)**2 - (Vy)**2) + r_c
+        elif s == 1:
+            Vz = z0 + np.sqrt(r_c**2 - (Vx)**2 - (Vy)**2) - r_c
+        else:
+            Vz = 0
+    elif not properties["Concave"]:
+        if s == -1:
+            Vz = z0*np.ones([len(Vx),1])
+        elif s == 1:
+            Vz = z0*np.ones([len(Vx),1])
+        else:
+            Vz = 0
 
-    if s == -1:
-        Vz = z0 - np.sqrt(r_c**2 - (Vx)**2 - (Vy)**2) + r_c
-    elif s == 1:
-        Vz = z0 + np.sqrt(r_c**2 - (Vx)**2 - (Vy)**2) - r_c
-    else:
-        Vz = 0
 
     Vx = Vx.reshape([len(Vx),1])
     Vy = Vy.reshape([len(Vy),1])
