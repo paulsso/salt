@@ -1,9 +1,5 @@
-import time, os, sys
-try:
-    import numpy as np
-except:
-    os.system("pip install numpy")
-    import numpy as np
+import time, sys
+import numpy as np
 
 def CreateTransducer(properties):
     """ Method for constructing a single transducer """
