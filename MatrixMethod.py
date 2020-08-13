@@ -324,7 +324,6 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
         C2 = 0
 
     if zPosProperties["Type"] == "Transducer" and zNegProperties["Type"] == "Reflector":
-        # TODO : COMPUTE PRESSURE WITH MULTIPLE REFLECTIONS
         PT0 = (C1)*T_TM@U1;
         PT1 = (C1)*(A1)*T_RM@T_TR@U1;
         PT2 = (C1)*(A1**2)*T_TM@T_RT@T_TR@U1;

@@ -74,9 +74,9 @@ class types:
 
         properties.update({"Concave" : var_checkbox})
 
-        labels = np.append(labels, tk.Label(frame, text="Vertical Displacement (mm)"))
+        labels = np.append(labels, tk.Label(frame, text="Vertical Position (mm)"))
         labels[0].pack(pady=0)
-        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=500, tickinterval=50,
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[0].pack(padx=10, pady=2)
         scales[0].set(68)
@@ -97,7 +97,7 @@ class types:
         scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[2].pack(padx=10, pady=2)
-        scales[2].set(50)
+        scales[2].set(45)
 
         properties.update({"Radius" : scales[2]})
 
@@ -149,9 +149,9 @@ class types:
 
         properties.update({"Concave" : var_checkbox})
 
-        labels = np.append(labels, tk.Label(frame, text="Vertical Displacement (mm)"))
+        labels = np.append(labels, tk.Label(frame, text="Vertical Position (mm)"))
         labels[0].pack(pady=0)
-        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=500, tickinterval=50,
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[0].pack(padx=10, pady=2)
         scales[0].set(68)
@@ -204,9 +204,9 @@ class types:
 
         properties.update({"Concave" : var_checkbox})
 
-        labels = np.append(labels, tk.Label(frame, text="Vertical Displacement (mm)"))
+        labels = np.append(labels, tk.Label(frame, text="Vertical Position (mm)"))
         labels[0].pack(pady=0)
-        scales = np.append(scales, tk.Scale(frame, from_=0, to=100, tickinterval=50,
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=500, tickinterval=50,
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[0].pack(padx=10, pady=2)
         scales[0].set(68)
