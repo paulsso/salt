@@ -344,6 +344,30 @@ class Pager:
         else:
             print("Please define system geometry")
 
+    def compute_pressure(self, masterframe_inst):
+        top_selection = masterframe_inst.top_selection
+        bot_selection = masterframe_inst.bot_selection
+
+        if top_selection.get() != "Select Type" or bot_selection.get() != "Select Type":
+            bot_properties, top_properties, medium_properties = definedicts(self, masterframe_inst)
+
+            start = time.time()
+            relative_potential, pressure, x_span, z_span = MatrixMethod(medium_properties,top_properties,bot_properties)
+            end = time.time()
+            diff = end - start
+            print("Total time elapsed was %.4f" % diff, "seconds")
+            x = len(x_span)
+            z = len(z_span)
+            _pressure = np.real(pressure).reshape([z, x])
+            maxPressure = np.max(_pressure)
+            minPressure = np.min(_pressure)
+            fig = plt.figure(figsize=(8, 6), dpi= 80, facecolor='w', edgecolor='k')
+            cs = plt.contourf(_pressure, np.linspace(minPressure,maxPressure,1000), cmap='bone', extend='both')
+            plt.colorbar()
+            plt.show()
+        else:
+            print("Please define system geometry")
+
 class masterframe(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -413,10 +437,10 @@ class masterframe(tk.Tk):
         command=lambda:pager.compute_potential(self))
         self.btns[1].pack(pady=10, padx = 5, side=tk.LEFT)
 
-        # self.btns[2] = tk.Button(self.frames[3], text="Compute Pressure",
-        # command=lambda:pager.compute_pressure(self))
-        # self.btns[2].pack(pady=10, padx = 5, side=tk.LEFT)
-        #
+        self.btns[2] = tk.Button(self.frames[3], text="Compute Pressure",
+        command=lambda:pager.compute_pressure(self))
+        self.btns[2].pack(pady=10, padx = 5, side=tk.LEFT)
+
         # self.btns[3] = tk.Button(self.frames[3], text="Animate Phase Shift",
         # command=lambda:pager.animate(self))
         # self.btns[3].pack(pady=10, padx = 5, side=tk.LEFT)
