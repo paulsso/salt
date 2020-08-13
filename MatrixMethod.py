@@ -331,8 +331,8 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
         PT4 = (C1)*(A1**4)*T_TM@T_RT@T_TR@T_RT@T_TR@U1;
         PT5 = (C1)*(A1**5)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
         PT6 = (C1)*(A1**6)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
-        PT = PT0 + PT1 + PT2 + PT3 + PT4 + PT5 + PT6
-        PR = PT*0
+        PT = PT0 + PT2 + PT4 + PT6
+        PR = PT1 + PT3 + PT5
     elif (zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Array") or (zPosProperties["Type"] == "Transducer" and zNegProperties["Type"] == "Array"):
         PT = (C1)*T_TM@U1
         PR = (C2)*T_RM@U2

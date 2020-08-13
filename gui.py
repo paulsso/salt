@@ -65,6 +65,7 @@ def definedicts(page_inst, masterframe_inst):
 class types:
     def array(self, frame):
         """ Method adds widgets relevant to an array of transducers """
+
         labels, scales, entries = [], [], []
         properties = {}
 
@@ -76,10 +77,16 @@ class types:
 
         labels = np.append(labels, tk.Label(frame, text="Vertical Position (mm)"))
         labels[0].pack(pady=0)
-        scales = np.append(scales, tk.Scale(frame, from_=0, to=500, tickinterval=50,
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=250, tickinterval=50,
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[0].pack(padx=10, pady=2)
-        scales[0].set(68)
+        # scales[0].set(68)
+
+        entries = np.append(entries, tk.Entry(frame, width = 8,
+        xscrollcommand = lambda x, y: scales[0].set(float(entries[0].get())) ))
+        entries[0].pack(padx=2, pady=2)
+        entries[0].place(x=215, y=77)
+        entries[0].insert(0, 68.6)
 
         properties.update({"Displacement" : scales[0]})
 
@@ -112,10 +119,10 @@ class types:
         labels = np.append(labels, tk.Label(frame, text="Transducer frequency (kHz):"))
         labels[4].pack(pady=0)
         entries = np.append(entries, tk.Entry(frame, width = 8))
-        entries[0].pack(padx=10, pady=2)
-        entries[0].insert(0, 40.0)
+        entries[1].pack(padx=10, pady=2)
+        entries[1].insert(0, 40.0)
 
-        properties.update({"TransFreq" : entries[0]})
+        properties.update({"TransFreq" : entries[1]})
 
         labels = np.append(labels, tk.Label(frame, text="Number of Layers:"))
         labels[5].pack(pady=0)
@@ -131,10 +138,10 @@ class types:
         v = [6, 12, 18, 24, 32, 36, 42, 48]
         for i in range(0,8):
             entries = np.append(entries, tk.Entry(frame, width=2))
-            entries[1+i].pack(side=tk.LEFT, padx=10, pady=10)
-            entries[1+i].insert(0,v[i])
+            entries[2+i].pack(side=tk.LEFT, padx=10, pady=10)
+            entries[2+i].insert(0,v[i])
 
-        properties.update({"Depth" : entries[1:]})
+        properties.update({"Depth" : entries[2:]})
 
         return properties, labels, scales, entries, checkbox
 
@@ -151,10 +158,16 @@ class types:
 
         labels = np.append(labels, tk.Label(frame, text="Vertical Position (mm)"))
         labels[0].pack(pady=0)
-        scales = np.append(scales, tk.Scale(frame, from_=0, to=500, tickinterval=50,
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=250, tickinterval=50,
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[0].pack(padx=10, pady=2)
-        scales[0].set(68)
+        # scales[0].set(68)
+
+        entries = np.append(entries, tk.Entry(frame, width = 8,
+        xscrollcommand = lambda x, y: scales[0].set(float(entries[0].get())) ))
+        entries[0].pack(padx=2, pady=2)
+        entries[0].place(x=215, y=77)
+        entries[0].insert(0, 68.6)
 
         properties.update({"Displacement" : scales[0]})
 
@@ -187,9 +200,9 @@ class types:
         labels = np.append(labels, tk.Label(frame, text="Transducer frequency (kHz):"))
         labels[4].pack(pady=0)
         entries = np.append(entries, tk.Entry(frame, width = 8))
-        entries[0].pack(padx=10, pady=2)
-        entries[0].insert(0,40.0)
-        properties.update({"TransFreq" : entries[0]})
+        entries[1].pack(padx=10, pady=2)
+        entries[1].insert(0,40.0)
+        properties.update({"TransFreq" : entries[1]})
 
         return properties, labels, scales, entries, checkbox
 
@@ -206,10 +219,16 @@ class types:
 
         labels = np.append(labels, tk.Label(frame, text="Vertical Position (mm)"))
         labels[0].pack(pady=0)
-        scales = np.append(scales, tk.Scale(frame, from_=0, to=500, tickinterval=50,
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=250, tickinterval=50,
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[0].pack(padx=10, pady=2)
-        scales[0].set(68)
+        # scales[0].set(68)
+
+        entries = np.append(entries, tk.Entry(frame, width = 8,
+        xscrollcommand = lambda x, y: scales[0].set(float(entries[0].get())) ))
+        entries[0].pack(padx=2, pady=2)
+        entries[0].place(x=215, y=77)
+        entries[0].insert(0, 68.6)
 
         properties.update({"Displacement" : scales[0]})
 
