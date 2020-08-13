@@ -233,9 +233,10 @@ def TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_i
 
     c = mediumProperties["SpeedOfSound"]
     f1 = zPosProperties["TransFreq"]
-    try:
+
+    if "TransFreq" in zNegProperties:
         f2 = zNegProperties["TransFreq"]
-    except:
+    else:
         f2 = 0
 
     if f1 != 0:
@@ -312,7 +313,7 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
     if f2 != 0:
         wL2 = c/f2
         omega2 = 2 * np.pi * f2
-        U2 = -np.ones([nR, 1])*d2*np.exp(-1j*(omega2*t1))
+        U2 = -np.ones([nR, 1])*d2*np.exp(-1j*(omega2*t2))
         A2 = (1j/wL2)
         C2 = omega2*rho*c/wL2
     if f2 == 0:
