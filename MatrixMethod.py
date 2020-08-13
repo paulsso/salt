@@ -276,12 +276,18 @@ def TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_i
 
 def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProperties,nT,nR,nM):
     """ Method computes pressure matrix in accordance with the matrix method """
-    t = 0
+
+    t1 = zPosProperties["Phase"]
     f1 = zPosProperties["TransFreq"]
 
-    try:
+    if "Phase" in zNegProperties:
+        t2 = zNegProperties["Phase"]
+    else:
+        t2 = 0
+
+    if "TransFreq" in zNegProperties:
         f2 = zNegProperties["TransFreq"]
-    except:
+    else:
         f2 = 0
 
     d1 = 1e-6
@@ -293,7 +299,7 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
     if f1 != 0:
         wL1 = c/f1
         omega1 = 2 * np.pi * f1
-        U1 = np.ones([nT, 1])*d1*np.exp(-1j*(omega1*t))
+        U1 = np.ones([nT, 1])*d1*np.exp(-1j*(omega1*t1))
         A1 = (1j/wL1)
         C1 = omega1*rho*c/wL1
     if f1 == 0:
@@ -306,7 +312,7 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
     if f2 != 0:
         wL2 = c/f2
         omega2 = 2 * np.pi * f2
-        U2 = -np.ones([nR, 1])*d2*np.exp(-1j*(omega2*t))
+        U2 = -np.ones([nR, 1])*d2*np.exp(-1j*(omega2*t1))
         A2 = (1j/wL2)
         C2 = omega2*rho*c/wL2
     if f2 == 0:
