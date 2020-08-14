@@ -463,8 +463,3 @@ class masterframe(tk.Tk):
         # self.btns[3] = tk.Button(self.frames[3], text="Animate Phase Shift",
         # command=lambda:pager.animate(self))
         # self.btns[3].pack(pady=10, padx = 5, side=tk.LEFT)
-
-root = masterframe()
-root.setouterproperties()
-root.placemainwidgets()
-root.mainloop()
