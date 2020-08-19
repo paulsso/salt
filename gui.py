@@ -12,7 +12,7 @@ except:
     os.system("pip install matplotlib")
     from matplotlib import pyplot as plt
 
-from MatrixMethod import MatrixMethod, CreateGeometry
+from matrixmethod import MatrixMethod, CreateGeometry
 from mpl_toolkits.mplot3d import axes3d, Axes3D
 
 def definedicts(page_inst, masterframe_inst):
@@ -38,6 +38,8 @@ def definedicts(page_inst, masterframe_inst):
                 top_properties[key] = float(top_properties[key])*1e3
             if key == "Layers":
                 top_properties[key] = int(top_properties[key])
+            if key == "Phase":
+                top_properties[key] = int(top_properties[key])/180
 
         else:
             v = []
@@ -54,6 +56,8 @@ def definedicts(page_inst, masterframe_inst):
                 bot_properties[key] = float(bot_properties[key])*1e3
             if key == "Layers":
                 bot_properties[key] = int(bot_properties[key])
+            if key == "Phase":
+                bot_properties[key] = int(bot_properties[key])/180
         else:
             v = []
             for item in page_inst.properties_page2[key]:
@@ -110,7 +114,7 @@ class types:
 
         labels = np.append(labels, tk.Label(frame, text="Phase shift (degrees)"))
         labels[3].pack(pady=0)
-        scales = np.append(scales, tk.Scale(frame, from_=0, to=179, tickinterval=90,
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=180, tickinterval=90,
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[3].pack(padx=10, pady=2)
 
@@ -191,7 +195,7 @@ class types:
 
         labels = np.append(labels, tk.Label(frame, text="Phase shift (degrees)"))
         labels[3].pack(pady=0)
-        scales = np.append(scales, tk.Scale(frame, from_=0, to=179, tickinterval=90,
+        scales = np.append(scales, tk.Scale(frame, from_=0, to=180, tickinterval=90,
         orient=tk.HORIZONTAL, variable = tk.IntVar(), length=250))
         scales[3].pack(padx=10, pady=2)
 
@@ -317,33 +321,6 @@ class Pager:
             self.properties_page2, self.labels_page2, self.scales_page2, self.entries_page2, self.checkbox_page2 = type.array(frame)
 
 
-    def compute_potential(self, masterframe_inst):
-        top_selection = masterframe_inst.top_selection
-        bot_selection = masterframe_inst.bot_selection
-
-        if top_selection.get() != "Select Type" or bot_selection.get() != "Select Type":
-            bot_properties, top_properties, medium_properties = definedicts(self, masterframe_inst)
-
-            start = time.time()
-            relative_potential, pressure, x_span, z_span = MatrixMethod(medium_properties,top_properties,bot_properties)
-            end = time.time()
-            diff = end - start
-            print("Total time elapsed was %.4f" % diff, "seconds")
-            x = len(x_span)
-            z = len(z_span)
-            _relative_potential = np.real(relative_potential).reshape([z, x])
-            _pressure = np.real(pressure).reshape([z, x])
-            maxPotential = np.max(_relative_potential)
-            minPotential = np.min(_relative_potential)
-            maxPressure = np.max(_relative_potential)
-            minPressure = np.min(_relative_potential)
-            fig = plt.figure(figsize=(8, 6), dpi= 80, facecolor='w', edgecolor='k')
-            cs = plt.contourf(_relative_potential, np.linspace(minPotential,maxPotential,1000), cmap='bone', extend='both')
-            plt.colorbar()
-            plt.show()
-        else:
-            print("Please define system geometry")
-
     def render(self, masterframe_inst):
 
         if masterframe_inst.top_selection.get() != "Select Type" or masterframe_inst.bot_selection.get() != "Select Type":
@@ -363,6 +340,117 @@ class Pager:
         else:
             print("Please define system geometry")
 
+    def compute_potential(self, masterframe_inst):
+        top_selection = masterframe_inst.top_selection
+        bot_selection = masterframe_inst.bot_selection
+
+        if top_selection.get() != "Select Type" or bot_selection.get() != "Select Type":
+            bot_properties, top_properties, medium_properties = definedicts(self, masterframe_inst)
+
+            # Ux, Uy, Uz, Vx, Vy, Vz = CreateGeometry(top_properties, bot_properties)
+            #
+            # fig = plt.figure()
+            # ax = Axes3D(fig)
+            # ax.scatter3D(Vx, Vy, Vz, marker='.')
+            # ax.scatter3D(Ux, Uy, Uz, marker='.')
+            # ax.set_xlim([-0.05,0.05])
+            # ax.set_ylim([-0.05,0.05])
+            # ax.set_zlim([-0.065,0.065])
+
+            start = time.time()
+            acoustic_radiation_pressure, relative_potential, pressure, x_span, z_span = MatrixMethod(medium_properties,top_properties,bot_properties)
+            end = time.time()
+            diff = end - start
+            print("Total time elapsed was %.4f" % diff, "seconds")
+            x = len(x_span)
+            z = len(z_span)
+
+            xmax=np.max(x_span)*1e3
+            xmin=np.min(x_span)*1e3
+            zmax=np.max(z_span)*1e3
+            zmin=np.min(z_span)*1e3
+            x_span = x_span.reshape([x,1])
+            z_span = z_span.reshape([z,1])
+
+            _relative_potential = np.real(relative_potential).reshape([z, x])
+
+            maxPotential = np.max(_relative_potential)
+            minPotential = np.min(_relative_potential)
+
+            colormap = masterframe_inst.colormap.get()
+
+            fig = plt.figure(figsize=(8, 6), dpi = 80, facecolor='w', edgecolor='k')
+            cs = plt.contourf(_relative_potential, np.linspace(minPotential,maxPotential,1000), cmap=colormap, extend='both')
+            ax = plt.gca()
+            plt.tick_params(
+                axis='both',          # changes apply to the x-axis
+                which='both',      # both major and minor ticks are affected
+                bottom=False,      # ticks along the bottom edge are off
+                top=False,         # ticks along the top edge are off
+                labelbottom=False) # labels along the bottom edge are off
+
+            ax.set_ylabel("z (mm)",fontsize=16)
+            plt.yticks(size=16)
+            # plt.colorbar()
+            plt.show()
+        else:
+            print("Please define system geometry")
+
+    def compute_acoustic_rad(self, masterframe_inst):
+        top_selection = masterframe_inst.top_selection
+        bot_selection = masterframe_inst.bot_selection
+
+        if top_selection.get() != "Select Type" or bot_selection.get() != "Select Type":
+            bot_properties, top_properties, medium_properties = definedicts(self, masterframe_inst)
+
+            # Ux, Uy, Uz, Vx, Vy, Vz = CreateGeometry(top_properties, bot_properties)
+            #
+            # fig = plt.figure()
+            # ax = Axes3D(fig)
+            # ax.scatter3D(Vx, Vy, Vz, marker='.')
+            # ax.scatter3D(Ux, Uy, Uz, marker='.')
+            # ax.set_xlim([-0.05,0.05])
+            # ax.set_ylim([-0.05,0.05])
+            # ax.set_zlim([-0.065,0.065])
+
+            start = time.time()
+            _acoustic_radiation_pressure, relative_potential, pressure, x_span, z_span = MatrixMethod(medium_properties,top_properties,bot_properties)
+            end = time.time()
+            diff = end - start
+            print("Total time elapsed was %.4f" % diff, "seconds")
+            x = len(x_span)
+            z = len(z_span)
+
+            xmax=np.max(x_span)*1e3
+            xmin=np.min(x_span)*1e3
+            zmax=np.max(z_span)*1e3
+            zmin=np.min(z_span)*1e3
+            x_span = x_span.reshape([x,1])
+            z_span = z_span.reshape([z,1])
+
+            #_acoustic_radiation_pressure  = np.real(acoustic_radiation_pressure).reshape([z, x])
+
+            maxPotential = np.max(_acoustic_radiation_pressure)
+            minPotential = np.min(_acoustic_radiation_pressure)
+
+            colormap = masterframe_inst.colormap.get()
+
+            fig = plt.figure(figsize=(8, 6), dpi = 80, facecolor='w', edgecolor='k')
+            cs = plt.contourf(_acoustic_radiation_pressure, np.linspace(minPotential,maxPotential,1000), cmap=colormap, extend='both')
+            ax = plt.gca()
+            # plt.colorbar()
+            plt.tick_params(
+                axis='both',          # changes apply to the x-axis
+                which='both',      # both major and minor ticks are affected
+                bottom=False,      # ticks along the bottom edge are off
+                top=False,         # ticks along the top edge are off
+                labelbottom=False) # labels along the bottom edge are off
+            ax.set_ylabel("z (mm)",fontsize=16)
+            plt.yticks(size=16)
+            plt.show()
+        else:
+            print("Please define system geometry")
+
     def compute_pressure(self, masterframe_inst):
         top_selection = masterframe_inst.top_selection
         bot_selection = masterframe_inst.bot_selection
@@ -371,18 +459,45 @@ class Pager:
             bot_properties, top_properties, medium_properties = definedicts(self, masterframe_inst)
 
             start = time.time()
-            relative_potential, pressure, x_span, z_span = MatrixMethod(medium_properties,top_properties,bot_properties)
+            acoustic_radiation_pressure, relative_potential, pressure, x_span, z_span = MatrixMethod(medium_properties,top_properties,bot_properties)
             end = time.time()
             diff = end - start
             print("Total time elapsed was %.4f" % diff, "seconds")
             x = len(x_span)
             z = len(z_span)
+
+            xmax=np.max(x_span)*1e3
+            xmin=np.min(x_span)*1e3
+            zmax=np.max(z_span)*1e3
+            zmin=np.min(z_span)*1e3
+            x_span = x_span.reshape([x,1])
+            z_span = z_span.reshape([z,1])
+
             _pressure = np.real(pressure).reshape([z, x])
             maxPressure = np.max(_pressure)
             minPressure = np.min(_pressure)
-            fig = plt.figure(figsize=(8, 6), dpi= 80, facecolor='w', edgecolor='k')
-            cs = plt.contourf(_pressure, np.linspace(minPressure,maxPressure,1000), cmap='bone', extend='both')
-            plt.colorbar()
+
+            colormap = masterframe_inst.colormap.get()
+
+            fig = plt.figure(figsize=(8, 6), dpi = 80, facecolor='w', edgecolor='k')
+            # cs = plt.contourf(_pressure, np.linspace(minPressure,maxPressure,1000), cmap=colormap, extend='both')
+            cs = plt.contourf(_pressure, 41, cmap=colormap)
+            ax = plt.gca()
+
+            plt.tick_params(
+                axis='both',          # changes apply to the x-axis
+                which='both',      # both major and minor ticks are affected
+                bottom=False,      # ticks along the bottom edge are off
+                top=False,         # ticks along the top edge are off
+                labelbottom=False,
+                labelsize=16) # labels along the bottom edge are off
+
+            ax.set_ylabel("z (mm)",fontsize=16)
+            plt.yticks(size=16)
+
+            cb = plt.colorbar()
+            for t in cb.ax.get_yticklabels():
+                t.set_fontsize(20)
             plt.show()
         else:
             print("Please define system geometry")
@@ -447,18 +562,28 @@ class masterframe(tk.Tk):
         self.frames[3] = tk.LabelFrame(self, text="Options", padx=10, pady=10)
         self.frames[3].pack(padx=10,pady=10,side=tk.BOTTOM)
 
-
         self.btns[0] = tk.Button(self.frames[3], text="Display Geometry",
         command=lambda:pager.render(self))
         self.btns[0].pack(pady=10, padx =5, side=tk.LEFT)
 
-        self.btns[1] = tk.Button(self.frames[3], text="Compute Relative Acoustic Potential",
-        command=lambda:pager.compute_potential(self))
+        self.btns[1] = tk.Button(self.frames[3], text="Compute Acoustic Radiation Pressure",
+        command=lambda:pager.compute_acoustic_rad(self))
         self.btns[1].pack(pady=10, padx = 5, side=tk.LEFT)
 
-        self.btns[2] = tk.Button(self.frames[3], text="Compute Pressure",
-        command=lambda:pager.compute_pressure(self))
+        self.btns[2] = tk.Button(self.frames[3], text="Compute Relative Acoustic Potential",
+        command=lambda:pager.compute_potential(self))
         self.btns[2].pack(pady=10, padx = 5, side=tk.LEFT)
+
+        self.btns[3] = tk.Button(self.frames[3], text="Compute Pressure",
+        command=lambda:pager.compute_pressure(self))
+        self.btns[3].pack(pady=10, padx = 5, side=tk.LEFT)
+
+        self.colormap = tk.StringVar()
+        self.colormap.set("jet")
+        self.drops[3] = tk.OptionMenu(self.frames[3], self.colormap,
+        "hot", "hsv", "jet", "winter", "bone")
+        self.drops[3].pack(pady=10, padx = 5, side=tk.BOTTOM)
+        self.drops[3].place(x=275, y = -28)
 
         # self.btns[3] = tk.Button(self.frames[3], text="Animate Phase Shift",
         # command=lambda:pager.animate(self))

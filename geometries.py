@@ -52,8 +52,8 @@ def CreateArray(properties):
 
 def CreateMedium(Vx,Vz,Ux,Uz):
     """Function generates points in a plane between components where pressure will be calculated"""
-    xMax = np.round(np.max(Vx)+1e-3,3)
-    xMin = np.round(-np.max(Vx)-1e-3,3)
+    xMax = np.round(np.max(Ux)+1e-3,3)
+    xMin = np.round(-np.max(Ux)-1e-3,3)
     zMax = np.round(np.min(Vz)-1e-3,3)
     zMin = np.round(np.max(Uz)+1e-3,3)
 

@@ -21,11 +21,12 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
 
     rho = mediumProperties["Density"]
     c = mediumProperties["SpeedOfSound"]
+    t = 0
 
     if f1 != 0:
         wL1 = c/f1
         omega1 = 2 * np.pi * f1
-        U1 = np.ones([nT, 1])*d1*np.exp(-1j*(omega1*t1))
+        U1 = np.ones([nT, 1])*d1*np.exp(-1j*(omega1*t + np.pi*t1))
         A1 = (1j/wL1)
         C1 = omega1*rho*c/wL1
     if f1 == 0:
@@ -38,7 +39,7 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
     if f2 != 0:
         wL2 = c/f2
         omega2 = 2 * np.pi * f2
-        U2 = -np.ones([nR, 1])*d2*np.exp(-1j*(omega2*t2))
+        U2 = -np.ones([nR, 1])*d2*np.exp(-1j*(omega2*t + np.pi*t2))
         A2 = (1j/wL2)
         C2 = omega2*rho*c/wL2
     if f2 == 0:
@@ -56,8 +57,11 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
         PT4 = (C1)*(A1**4)*T_TM@T_RT@T_TR@T_RT@T_TR@U1;
         PT5 = (C1)*(A1**5)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
         PT6 = (C1)*(A1**6)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
-        PT = PT0 + PT2 + PT4 + PT6
-        PR = PT1 + PT3 + PT5
+        PT7 = (C1)*(A1**7)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
+        PT8 = (C1)*(A1**8)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
+        PT9 = (C1)*(A1**9)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
+        PT = PT0 + PT2 + PT4 + PT6 + PT8
+        PR = PT1 + PT3 + PT5 + PT7 + PT9
     elif (zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Array") or (zPosProperties["Type"] == "Transducer" and zNegProperties["Type"] == "Array"):
         PT = (C1)*T_TM@U1
         PR = (C2)*T_RM@U2
