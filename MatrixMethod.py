@@ -90,12 +90,8 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
 
     c = mediumProperties["SpeedOfSound"]
     rho = mediumProperties["Density"]
-    wL = zPosProperties["TransFreq"]
 
-    k = np.pi / wL
-
-    acoustic_radiation_pressure = (((np.real(pressure)**2)/(4*rho*c**2))*np.cos(2*k*Mz)).reshape([z, x])
-
+    acoustic_radiation_pressure = np.real(((pressure*np.conj(pressure))/(4*rho*c**2)).reshape([z, x]))
     return acoustic_radiation_pressure, relative_potential, pressure, x_span, z_span
 
 def CreateGeometry(zPosProperties, zNegProperties):

@@ -69,8 +69,8 @@ def TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_i
         kk2 = 0
 
     if zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Array":
-        T_TR = Sn*np.exp(-1j*kk1*r_in - 1j*kk2*r_ni)/(r_in)
-        T_RT = Si*np.exp(-1j*kk1*r_ni - 1j*kk2*r_in)/(r_ni)
+        T_TR = Sn*np.exp(-1j*kk1*r_ni - 1j*kk2*r_in)/(r_in)
+        T_RT = Si*np.exp(-1j*kk1*r_in - 1j*kk2*r_ni)/(r_ni)
         T_RM = Sn*np.exp(-1j*kk1*r_im)/r_im
         T_TM = Si*np.exp(-1j*kk2*r_nm)/r_nm
     elif zPosProperties["Type"] == "Array" and zNegProperties["Type"] =="Reflector":
