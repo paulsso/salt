@@ -468,11 +468,11 @@ class Pager:
             ax.set_xlabel("z (mm)",fontsize=16, labelpad=5)
             plt.xticks(rotation=45)
 
-            gradx, grady = np.gradient(relative_potential.reshape([z_len, x_len]),5e-4,5e-4)
-            force = gradx + grady
-            force_gradx, force_grady = np.gradient(force,5e-4,5e-4)
-            force_grad = force_gradx + force_grady
-
+            # gradx, grady = np.gradient(relative_potential.reshape([z_len, x_len]),5e-4,5e-4)
+            # force = gradx + grady
+            # force_gradx, force_grady = np.gradient(force,5e-4,5e-4)
+            # force_grad = force_gradx + force_grady
+            #
             fig = plt.figure(figsize=(8, 6), dpi = 80, facecolor='w', edgecolor='k')
             ax = fig.add_subplot(111, projection='3d')
             ax.scatter(Vz*1e3, Vy*1e3, Vx*1e3, marker='.')
@@ -481,12 +481,12 @@ class Pager:
             ax.set_ylim([-50,50])
             ax.set_zlim([-50,50])
             ax.view_init(azim=0,elev=90)
+            #
+            min_pressure = np.min(pressure)
+            max_pressure = np.max(pressure)
+            levels = np.linspace(min_pressure,max_pressure,100)
 
-            min_grad = np.min(force_grad)
-            max_grad = np.max(force_grad)
-            levels = np.linspace(min_grad,max_grad,100)
-
-            cset2 = ax.contourf(X, Y, force_grad, cmap=colormap)
+            cset2 = ax.contourf(X, Y, pressure, levels, cmap=colormap)
             ax.clabel(cset2, fontsize=9, inline=1)
             ax.set_xlabel("z (mm)",fontsize=16, labelpad=16)
             plt.xticks(rotation=45)
