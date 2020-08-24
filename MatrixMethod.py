@@ -92,7 +92,7 @@ def MatrixMethod(mediumProperties,zPosProperties,zNegProperties):
     rho = mediumProperties["Density"]
 
     acoustic_radiation_pressure = np.real(((pressure*np.conj(pressure))/(4*rho*c**2)).reshape([z, x]))
-    return acoustic_radiation_pressure, relative_potential, pressure, x_span, z_span
+    return acoustic_radiation_pressure, relative_potential, np.real(P_), x_span, z_span
 
 def CreateGeometry(zPosProperties, zNegProperties):
     if zPosProperties["Type"] == "Array":
