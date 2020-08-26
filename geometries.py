@@ -44,6 +44,7 @@ def CreateArray(properties):
         Vx = np.delete(Vx,np.argwhere(np.isnan(S)))
         Vy = np.delete(Vy,np.argwhere(np.isnan(S)))
         Vz = np.delete(Vz,np.argwhere(np.isnan(S)))
+
     Vx = Vx.reshape([len(Vx),1])
     Vy = Vy.reshape([len(Vy),1])
     Vz = Vz.reshape([len(Vz),1])
@@ -52,13 +53,13 @@ def CreateArray(properties):
 
 def CreateMedium(Vx,Vz,Ux,Uz):
     """Function generates points in a plane between components where pressure will be calculated"""
-    xMax = np.round(np.max(Ux)+1e-3,3)
-    xMin = np.round(-np.max(Ux)-1e-3,3)
-    zMax = np.round(np.min(Vz)-1e-3,3)
-    zMin = np.round(np.max(Uz)+1e-3,3)
+    xMax = np.max(Ux)+5e-4
+    xMin = -np.max(Ux)-5e-4
+    zMax = np.min(Vz)-5e-4
+    zMin = np.max(Uz)+5e-4
 
-    x_span = np.arange(xMin, xMax+1e-3, 1e-3)
-    z_span = np.arange(zMin, zMax+1e-3, 1e-3)
+    x_span = np.arange(xMin, xMax, 1e-3)
+    z_span = np.arange(zMin, zMax, 1e-3)
 
     Mx, Mz = np.meshgrid(x_span, z_span, sparse=False)
 

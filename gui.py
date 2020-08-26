@@ -39,8 +39,8 @@ def definedicts(page_inst, masterframe_inst):
             if key == "Layers":
                 top_properties[key] = int(top_properties[key])
             if key == "Phase":
-                top_properties[key] = int(top_properties[key])/180
-
+                top_properties[key] = int(top_properties[key])
+                
         else:
             v = []
             for item in page_inst.properties_page1[key]:
@@ -57,7 +57,7 @@ def definedicts(page_inst, masterframe_inst):
             if key == "Layers":
                 bot_properties[key] = int(bot_properties[key])
             if key == "Phase":
-                bot_properties[key] = int(bot_properties[key])/180
+                bot_properties[key] = int(bot_properties[key])
         else:
             v = []
             for item in page_inst.properties_page2[key]:
@@ -462,36 +462,15 @@ class Pager:
             fig = plt.figure(figsize=(8, 6), dpi = 80, facecolor='w', edgecolor='k')
             plt.title("Radiation Pressure Profile", fontsize=16)
             ax = plt.gca()
+            
             xPlot=np.linspace(zmin, zmax, z_len)
             plt.plot(xPlot,profile)
             ax.set_xticks(xPlot[::5])
             ax.set_xlabel("z (mm)",fontsize=16, labelpad=5)
             plt.xticks(rotation=45)
 
-            # gradx, grady = np.gradient(relative_potential.reshape([z_len, x_len]),5e-4,5e-4)
-            # force = gradx + grady
-            # force_gradx, force_grady = np.gradient(force,5e-4,5e-4)
-            # force_grad = force_gradx + force_grady
-            #
-            fig = plt.figure(figsize=(8, 6), dpi = 80, facecolor='w', edgecolor='k')
-            ax = fig.add_subplot(111, projection='3d')
-            ax.scatter(Vz*1e3, Vy*1e3, Vx*1e3, marker='.')
-            ax.scatter(Uz*1e3, Uy*1e3, Ux*1e3, marker='.')
-            ax.set_xlim([-50,50])
-            ax.set_ylim([-50,50])
-            ax.set_zlim([-50,50])
-            ax.view_init(azim=0,elev=90)
-            #
-            min_pressure = np.min(pressure)
-            max_pressure = np.max(pressure)
-            levels = np.linspace(min_pressure,max_pressure,100)
-
-            cset2 = ax.contourf(X, Y, pressure, levels, cmap=colormap)
-            ax.clabel(cset2, fontsize=9, inline=1)
-            ax.set_xlabel("z (mm)",fontsize=16, labelpad=16)
-            plt.xticks(rotation=45)
-            plt.title("Acoustic Force Gradient", fontsize=16)
-            plt.xticks(size=16)
+            np.savetxt('profile.txt', profile, delimiter=',')
+            np.savetxt('xPlot.txt', xPlot, delimiter=',')
 
             plt.show()
 
@@ -616,7 +595,7 @@ class masterframe(tk.Tk):
         command=lambda:pager.render(self))
         self.btns[0].pack(pady=10, padx =5, side=tk.LEFT)
 
-        self.btns[1] = tk.Button(self.frames[3], text="Run",
+        self.btns[1] = tk.Button(self.frames[3], text="Run Simulation",
         command=lambda:pager.compute_acoustic_rad(self))
         self.btns[1].pack(pady=10, padx = 5, side=tk.LEFT)
 
