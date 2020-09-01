@@ -37,8 +37,8 @@ def DistanceMatrices(Vx, Vy, Vz, Ux, Uy, Uz, Mx, My, Mz):
     Az = np.repeat(Uz, nT, 1)
     Bz = np.repeat(Vz.T, nR, 0)
 
-    r_in = np.sqrt((Bx-Ax)**2 + (By-Ay)**2 + (Bz-Az)**2)
-    r_ni = r_in.T
+    r_ni = np.sqrt((Bx-Ax)**2 + (By-Ay)**2 + (Bz-Az)**2)
+    r_in = r_ni.T
 
     return r_nm, r_im, r_in, r_ni
 
