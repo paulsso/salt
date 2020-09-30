@@ -4,4 +4,3 @@ root = masterframe()
 root.setouterproperties()
 root.placemainwidgets()
 root.mainloop()
-

@@ -35,7 +35,7 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
         U1 = np.zeros([nT, 1])
         A1 = 0
         C1 = 0
-
+    
     if f2 != 0:
         wL2 = c/f2
         omega2 = 2 * np.pi * f2
@@ -50,16 +50,16 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
         C2 = 0
 
     if zPosProperties["Type"] == "Transducer" and zNegProperties["Type"] == "Reflector":
-        PT0 = (C1)*T_TM@U1;
-        PT1 = (C1)*(A1)*T_RM@T_TR@U1;
-        PT2 = (C1)*(A1**2)*T_TM@T_RT@T_TR@U1;
-        PT3 = (C1)*(A1**3)*T_RM@T_TR@T_RT@T_TR@U1;
-        PT4 = (C1)*(A1**4)*T_TM@T_RT@T_TR@T_RT@T_TR@U1;
-        PT5 = (C1)*(A1**5)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
-        PT6 = (C1)*(A1**6)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
-        PT7 = (C1)*(A1**7)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
-        PT8 = (C1)*(A1**8)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
-        PT9 = (C1)*(A1**9)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1;
+        PT0 = (C1)*T_TM@U1
+        PT1 = (C1)*(A1)*T_RM@T_TR@U1
+        PT2 = (C1)*(A1**2)*T_TM@T_RT@T_TR@U1
+        PT3 = (C1)*(A1**3)*T_RM@T_TR@T_RT@T_TR@U1
+        PT4 = (C1)*(A1**4)*T_TM@T_RT@T_TR@T_RT@T_TR@U1
+        PT5 = (C1)*(A1**5)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@U1
+        PT6 = (C1)*(A1**6)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1
+        PT7 = (C1)*(A1**7)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1
+        PT8 = (C1)*(A1**8)*T_TM@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1
+        PT9 = (C1)*(A1**9)*T_RM@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@T_RT@T_TR@U1
         PT = PT0 + PT2 + PT4 + PT6 + PT8
         PR = PT1 + PT3 + PT5 + PT7 + PT9
     elif (zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Array") or (zPosProperties["Type"] == "Transducer" and zNegProperties["Type"] == "Array"):

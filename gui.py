@@ -16,6 +16,7 @@ from matrixmethod import MatrixMethod, CreateGeometry
 from mpl_toolkits.mplot3d import axes3d, Axes3D
 
 def definedicts(page_inst, masterframe_inst):
+    """ Method organized input from scales etc into dictionaries """
     c = float(masterframe_inst.medium_c.get())
     rho = float(masterframe_inst.medium_density.get())
 
@@ -40,7 +41,7 @@ def definedicts(page_inst, masterframe_inst):
                 top_properties[key] = int(top_properties[key])
             if key == "Phase":
                 top_properties[key] = int(top_properties[key])
-                
+
         else:
             v = []
             for item in page_inst.properties_page1[key]:
@@ -68,7 +69,7 @@ def definedicts(page_inst, masterframe_inst):
 
 class types:
     def array(self, frame):
-        """ Method adds widgets relevant to an array of transducers """
+        """ Method adds input-widgets relevant to an array of transducers """
 
         labels, scales, entries = [], [], []
         properties = {}
@@ -76,6 +77,7 @@ class types:
         var_checkbox = tk.BooleanVar()
         checkbox = tk.Checkbutton(frame, text="Concave", variable=var_checkbox, onvalue=True, offvalue=False)
         checkbox.pack(pady=10)
+        var_checkbox.set(True)
 
         properties.update({"Concave" : var_checkbox})
 
@@ -84,13 +86,12 @@ class types:
         scales = np.append(scales, tk.Scale(frame, from_=0, to=250, tickinterval=50,
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[0].pack(padx=10, pady=2)
-        # scales[0].set(68)
 
         entries = np.append(entries, tk.Entry(frame, width = 8,
         xscrollcommand = lambda x, y: scales[0].set(float(entries[0].get())) ))
         entries[0].pack(padx=2, pady=2)
         entries[0].place(x=215, y=77)
-        entries[0].insert(0, 68.6)
+        entries[0].insert(0, 64)
 
         properties.update({"Displacement" : entries[0]})
 
@@ -105,7 +106,7 @@ class types:
         xscrollcommand = lambda x, y: scales[1].set(float(entries[1].get())) ))
         entries[1].pack(padx=2, pady=2)
         entries[1].place(x=215, y=163)
-        entries[1].insert(0, 60)
+        entries[1].insert(0, 64)
 
         properties.update({"RadiusCurvature" : entries[1]})
 
@@ -156,7 +157,7 @@ class types:
         return properties, labels, scales, entries, checkbox
 
     def transducer(self, frame):
-        """ Method adds widgets relevant to a transducer """
+        """ Method adds input-widgets relevant to a transducer """
         labels, scales, entries = [], [], []
         properties = {}
 
@@ -171,7 +172,6 @@ class types:
         scales = np.append(scales, tk.Scale(frame, from_=0, to=250, tickinterval=50,
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[0].pack(padx=10, pady=2)
-        # scales[0].set(68)
 
         entries = np.append(entries, tk.Entry(frame, width = 8,
         xscrollcommand = lambda x, y: scales[0].set(float(entries[0].get())) ))
@@ -238,7 +238,6 @@ class types:
         scales = np.append(scales, tk.Scale(frame, from_=0, to=250, tickinterval=50,
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[0].pack(padx=10, pady=2)
-        # scales[0].set(68)
 
         entries = np.append(entries, tk.Entry(frame, width = 8,
         xscrollcommand = lambda x, y: scales[0].set(float(entries[0].get())) ))
@@ -355,7 +354,7 @@ class Pager:
             plt.show()
         else:
             print("Please define system geometry")
-
+    """ UNUSED FUNCTIONS:
     def compute_potential(self, masterframe_inst):
         top_selection = masterframe_inst.top_selection
         bot_selection = masterframe_inst.bot_selection
@@ -407,6 +406,60 @@ class Pager:
             plt.show()
         else:
             print("Please define system geometry")
+    def compute_pressure(self, masterframe_inst):
+        top_selection = masterframe_inst.top_selection
+        bot_selection = masterframe_inst.bot_selection
+
+        if top_selection.get() != "Select Type" or bot_selection.get() != "Select Type":
+            bot_properties, top_properties, medium_properties = definedicts(self, masterframe_inst)
+
+            Ux, Uy, Uz, Vx, Vy, Vz = CreateGeometry(top_properties, bot_properties)
+
+            start = time.time()
+            acoustic_radiation_pressure, relative_potential, pressure, x_span, z_span = MatrixMethod(medium_properties,top_properties,bot_properties)
+            end = time.time()
+            diff = end - start
+            print("Total time elapsed was %.4f" % diff, "seconds")
+            x = len(x_span)
+            z = len(z_span)
+
+            xmax=np.max(x_span)*1e3
+            xmin=np.min(x_span)*1e3
+            zmax=np.max(z_span)*1e3
+            zmin=np.min(z_span)*1e3
+
+            _pressure = np.real(pressure).reshape([z, x])
+            maxPressure = np.max(_pressure)
+            minPressure = np.min(_pressure)
+
+            X, Y = np.mgrid[zmin:zmax,xmin:xmax]
+            Z = _pressure
+
+            maxPotential = np.max(Z)
+            minPotential = np.min(Z)
+
+            colormap = masterframe_inst.colormap.get()
+
+            fig = plt.figure(figsize=(8, 6), dpi = 80, facecolor='w', edgecolor='k')
+            ax = fig.add_subplot(111, projection='3d')
+            ax.scatter(Vz*1e3, Vy*1e3, Vx*1e3, marker='.')
+            ax.scatter(Uz*1e3, Uy*1e3, Ux*1e3, marker='.')
+            ax.set_xlim([-50,50])
+            ax.set_ylim([-50,50])
+            ax.set_zlim([-50,50])
+            ax.view_init(azim=0,elev=90)
+
+            levels = np.linspace(minPotential,maxPotential,1000)
+            cset = ax.contourf(X, Y, Z, levels, cmap=colormap)
+            ax.clabel(cset, fontsize=9, inline=1)
+            ax.set_xlabel("z (mm)",fontsize=16, labelpad=16)
+            plt.xticks(rotation=45)
+            plt.title("Acoustic Radiation Pressure", fontsize=16)
+            plt.xticks(size=16)
+            plt.show()
+        else:
+            print("Please define system geometry")
+            """
 
     def compute_acoustic_rad(self, masterframe_inst):
         top_selection = masterframe_inst.top_selection
@@ -462,7 +515,7 @@ class Pager:
             fig = plt.figure(figsize=(8, 6), dpi = 80, facecolor='w', edgecolor='k')
             plt.title("Radiation Pressure Profile", fontsize=16)
             ax = plt.gca()
-            
+
             xPlot=np.linspace(zmin, zmax, z_len)
             plt.plot(xPlot,profile)
             ax.set_xticks(xPlot[::5])
@@ -471,63 +524,9 @@ class Pager:
 
             np.savetxt('profile.txt', profile, delimiter=',')
             np.savetxt('xPlot.txt', xPlot, delimiter=',')
-
+            np.savetxt('acoustic_radiation.txt', Z, delimiter=',')
             plt.show()
 
-        else:
-            print("Please define system geometry")
-
-    def compute_pressure(self, masterframe_inst):
-        top_selection = masterframe_inst.top_selection
-        bot_selection = masterframe_inst.bot_selection
-
-        if top_selection.get() != "Select Type" or bot_selection.get() != "Select Type":
-            bot_properties, top_properties, medium_properties = definedicts(self, masterframe_inst)
-
-            Ux, Uy, Uz, Vx, Vy, Vz = CreateGeometry(top_properties, bot_properties)
-
-            start = time.time()
-            acoustic_radiation_pressure, relative_potential, pressure, x_span, z_span = MatrixMethod(medium_properties,top_properties,bot_properties)
-            end = time.time()
-            diff = end - start
-            print("Total time elapsed was %.4f" % diff, "seconds")
-            x = len(x_span)
-            z = len(z_span)
-
-            xmax=np.max(x_span)*1e3
-            xmin=np.min(x_span)*1e3
-            zmax=np.max(z_span)*1e3
-            zmin=np.min(z_span)*1e3
-
-            _pressure = np.real(pressure).reshape([z, x])
-            maxPressure = np.max(_pressure)
-            minPressure = np.min(_pressure)
-
-            X, Y = np.mgrid[zmin:zmax,xmin:xmax]
-            Z = _pressure
-
-            maxPotential = np.max(Z)
-            minPotential = np.min(Z)
-
-            colormap = masterframe_inst.colormap.get()
-
-            fig = plt.figure(figsize=(8, 6), dpi = 80, facecolor='w', edgecolor='k')
-            ax = fig.add_subplot(111, projection='3d')
-            ax.scatter(Vz*1e3, Vy*1e3, Vx*1e3, marker='.')
-            ax.scatter(Uz*1e3, Uy*1e3, Ux*1e3, marker='.')
-            ax.set_xlim([-50,50])
-            ax.set_ylim([-50,50])
-            ax.set_zlim([-50,50])
-            ax.view_init(azim=0,elev=90)
-
-            levels = np.linspace(minPotential,maxPotential,1000)
-            cset = ax.contourf(X, Y, Z, levels, cmap=colormap)
-            ax.clabel(cset, fontsize=9, inline=1)
-            ax.set_xlabel("z (mm)",fontsize=16, labelpad=16)
-            plt.xticks(rotation=45)
-            plt.title("Acoustic Radiation Pressure", fontsize=16)
-            plt.xticks(size=16)
-            plt.show()
         else:
             print("Please define system geometry")
 

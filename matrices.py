@@ -28,17 +28,17 @@ def DistanceMatrices(Vx, Vy, Vz, Ux, Uy, Uz, Mx, My, Mz):
 
     r_im = np.sqrt((Bx-Ax)**2 + (By-Ay)**2 + (Bz-Az)**2)
 
-    Ax = np.repeat(Ux, nT, 1)
-    Bx = np.repeat(Vx.T, nR, 0)
+    Ax = np.repeat(Vx, nR, 1)
+    Bx = np.repeat(Ux.T, nT, 0)
 
-    Ay = np.repeat(Uy, nT, 1)
-    By = np.repeat(Vy.T, nR, 0)
+    Ay = np.repeat(Vy, nR, 1)
+    By = np.repeat(Uy.T, nT, 0)
 
-    Az = np.repeat(Uz, nT, 1)
-    Bz = np.repeat(Vz.T, nR, 0)
+    Az = np.repeat(Vz, nR, 1)
+    Bz = np.repeat(Uz.T, nT, 0)
 
-    r_ni = np.sqrt((Bx-Ax)**2 + (By-Ay)**2 + (Bz-Az)**2)
-    r_in = r_ni.T
+    r_in = np.sqrt((Bx-Ax)**2 + (By-Ay)**2 + (Bz-Az)**2)
+    r_ni = r_in.T
 
     return r_nm, r_im, r_in, r_ni
 
@@ -63,14 +63,14 @@ def TransferMatrices(mediumProperties, zPosProperties, zNegProperties, r_nm, r_i
         kk1 = 0
     if f2 != 0:
         wL2 = c/f2
-        kk2 = 2*np.pi/wL2
+        kk2 = 2*np.pi/wL2        
     elif f2 == 0:
         wL2 = 0
         kk2 = 0
 
     if zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Array":
-        T_TR = Sn*np.exp(-1j*kk1*r_ni - 1j*kk2*r_in)/(r_in)
-        T_RT = Si*np.exp(-1j*kk1*r_in - 1j*kk2*r_ni)/(r_ni)
+        T_TR = Sn*np.exp(-1j*kk1*r_ni-1j*kk2*r_in)/(r_in)
+        T_RT = Si*np.exp(-1j*kk1*r_in-1j*kk2*r_ni)/(r_ni)
         T_RM = Sn*np.exp(-1j*kk1*r_im)/r_im
         T_TM = Si*np.exp(-1j*kk2*r_nm)/r_nm
     elif zPosProperties["Type"] == "Array" and zNegProperties["Type"] =="Reflector":
