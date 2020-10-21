@@ -52,7 +52,10 @@ def definedicts(page_inst, masterframe_inst):
         if key != "Depth":
             bot_properties.update({key : page_inst.properties_page2[key].get()})
             if key in ["Displacement", "RadiusCurvature", "Radius"]:
-                bot_properties[key] = float(bot_properties[key])*1e-3
+                try:
+                    bot_properties[key] = float(bot_properties[key])*1e-3
+                except ValueError:
+                    print(key)
             if key == "TransFreq":
                 bot_properties[key] = float(bot_properties[key])*1e3
             if key == "Layers":
@@ -216,8 +219,8 @@ class types:
         labels = np.append(labels, tk.Label(frame, text="Transducer frequency (kHz):"))
         labels[4].pack(pady=0)
         entries = np.append(entries, tk.Entry(frame, width = 8))
-        entries[1].pack(padx=10, pady=2)
-        entries[1].insert(0,40.0)
+        entries[2].pack(padx=10, pady=2)
+        entries[2].insert(0, 40.0)
         properties.update({"TransFreq" : entries[1]})
 
         return properties, labels, scales, entries, checkbox
@@ -244,12 +247,9 @@ class types:
 
         entries[0].pack(padx=2, pady=2)
         entries[0].place(x=215, y=77)
-        entries[0].insert(0, 68.6)
+        entries[0].insert(0, 32)
 
         properties.update({"Displacement" : entries[0]})
-
-        entries = np.append(entries, tk.Entry(frame, width = 8,
-        xscrollcommand = lambda x, y: scales[1].set(float(entries[1].get())) ))
 
         labels = np.append(labels, tk.Label(frame, text="Radius of Curvature (mm)"))
         labels[1].pack(pady=0)
@@ -257,6 +257,12 @@ class types:
         orient=tk.HORIZONTAL, variable = tk.DoubleVar(), length=250))
         scales[1].pack(padx=10, pady=2)
         scales[1].set(33)
+
+        entries = np.append(entries, tk.Entry(frame, width = 8,
+        xscrollcommand = lambda x, y: scales[1].set(float(entries[1].get())) ))
+        entries[1].pack(padx=2, pady=2)
+        entries[1].place(x=215, y=163)
+        entries[1].insert(0, 33)
 
         properties.update({"RadiusCurvature" : entries[1]})
 
@@ -354,6 +360,7 @@ class Pager:
             plt.show()
         else:
             print("Please define system geometry")
+
     """ UNUSED FUNCTIONS:
     def compute_potential(self, masterframe_inst):
         top_selection = masterframe_inst.top_selection
@@ -495,10 +502,22 @@ class Pager:
             ax = fig.add_subplot(111, projection='3d')
             ax.scatter(Vz*1e3, Vy*1e3, Vx*1e3, marker='.')
             ax.scatter(Uz*1e3, Uy*1e3, Ux*1e3, marker='.')
-            ax.set_xlim([-50,50])
-            ax.set_ylim([-50,50])
-            ax.set_zlim([-50,50])
-            ax.view_init(azim=0,elev=90)
+
+            zMax = np.max(Vx)*1e3
+            zMin = np.min(Ux)*1e3
+            yMax = np.max(Vy)*1e3
+            yMin = np.min(Uy)*1e3
+            xMax = np.max(Vz)*1e3
+            xMin = np.min(Uz)*1e3
+
+            ax.set_xlim([xMin,xMax])
+            ax.set_ylim([yMin,yMax])
+            ax.set_zlim([zMin,zMax])
+            ax.set_zticklabels([])
+            # ax.grid(False)
+            # ax.axis('off')
+
+            ax.view_init(azim=0,elev=-90)
 
             levels = np.linspace(minPotential,maxPotential,1000)
             cset = ax.contourf(X, Y, Z, levels, cmap=colormap)

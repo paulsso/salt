@@ -35,7 +35,7 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
         U1 = np.zeros([nT, 1])
         A1 = 0
         C1 = 0
-    
+
     if f2 != 0:
         wL2 = c/f2
         omega2 = 2 * np.pi * f2
@@ -67,7 +67,7 @@ def ComputePressure(mediumProperties,T_TR,T_RT,T_RM,T_TM,zPosProperties,zNegProp
         PR = (C2)*T_RM@U2
     elif zPosProperties["Type"] == "Array" and zNegProperties["Type"] == "Reflector":
         PT = (C1)*T_TM@U1
-        PR = (C1)*(A1)*T_RM@T_TR@U1
+        PR = (C1)*(A1)*T_RM@T_RT@U1
     elif zPosProperties["Type"] == "Reflector" and zNegProperties["Type"] == "Array":
         PR = (C2)*T_RM@U2
         PT = (C2)*(A2)*T_TM@T_RT@U2
