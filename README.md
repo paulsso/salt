@@ -1,6 +1,6 @@
 # Simulation platform for Acoustic Levitation Traps (SALT)
-This release is currently in its alpha-phase and some of the underlying computation modules should be replaced in the near future.
 #### A configurable implementation of a matrix method to approximate the pressure field in acoustic levitation devices
+**This release is currently in its alpha-phase and some of the underlying computation modules should be replaced in the near future.**
 
 ## How to use SALT:
 
