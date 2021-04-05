@@ -1,6 +1,5 @@
 # Simulation platform for Acoustic Levitation Traps (SALT)
 #### A configurable implementation of a matrix method to approximate the pressure field in acoustic levitation devices
-**This release is currently in its alpha-phase and some of the underlying computation modules should be replaced in the near future.**
 
 ## How to use SALT:
 
@@ -15,6 +14,9 @@ Use github desktop and copy-paste the URL of this repo or just download the zip-
 Launch the application by running the file ```main.py```, simply by double clicking the file or navigating to the folder where it is located in and typing ```python main.py``` in your command prompt or terminal.
 
 ### Usage
+
+![components](https://github.com/oskar-paulsson/salt/tree/master/assets/component.PNG)
+
 #### 
 ## What's left?
 Among many things that can be added are:
