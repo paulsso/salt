@@ -15,19 +15,35 @@ Launch the application by running the file ```main.py```, simply by double click
 
 ### Usage
 
-![components](https://ibb.co/5rmr80B)
+Choose components:
 
-![img2](https://ibb.co/J76zG34)
+<a href="https://ibb.co/5rmr80B"><img src="https://i.ibb.co/k4j487Q/component.png" alt="component" border="0" /></a>
 
-![img3](https://ibb.co/Kj3WGvs)
+Vertical offset: 
 
-![img4](https://ibb.co/WnQhmgT)
+<a href="https://ibb.co/dm8q8Xm"><img src="https://i.ibb.co/g4kpkQ4/vertical.png" alt="vertical" border="0" /></a>
 
-![img5](https://ibb.co/5BWmC3T)
+Radius of curvature:
 
-![img6](https://ibb.co/pKHpCVD)
+<a href="https://ibb.co/5BWmC3T"><img src="https://i.ibb.co/hDRbrNs/roc.png" alt="roc" border="0" /></a>
 
-![img7](https://ibb.co/kyHcjhG)
+Maximum size of the socket:
+
+<a href="https://ibb.co/pKHpCVD"><img src="https://i.ibb.co/7p3F7Mc/socket.png" alt="socket" border="0" /></a>
+
+Phase shift:
+
+<a href="https://ibb.co/WnQhmgT"><img src="https://i.ibb.co/Zd3jqWZ/phase.png" alt="phase" border="0" /></a>
+
+Adjust frequency: 
+
+<a href="https://ibb.co/J76zG34"><img src="https://i.ibb.co/zR9SB6Y/frequency.png" alt="frequency" border="0" /></a>
+
+Configure array: 
+
+<a href="https://ibb.co/kyHcjhG"><img src="https://i.ibb.co/JdBkVzc/transducers.png" alt="transducers" border="0" /></a>
+
+Options:
 
 <a href="https://imgbb.com/"><img src="https://i.ibb.co/mCM4BWy/options.png" alt="options" border="0" /></a>
 
