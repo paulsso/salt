@@ -2,7 +2,7 @@
 #### A configurable implementation of a matrix method to approximate the pressure field in acoustic levitation devices
 
 ## How to use SALT:
-
+### Installation
 #### 1. Install python
 SALT was tested in a virtual environment using python 3.7.4, its only dependencies are ```matplotlib``` and ```numpy```.
 
