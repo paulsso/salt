@@ -12,7 +12,7 @@ Use github desktop and copy-paste the URL of this repo or just download the zip-
 #### 3. Launch the application
 Launch the application by running the file ```main.py```, simply by double clicking the file or navigating to the folder where it is located in and typing ```python main.py``` in your command prompt or terminal.
 
-### What's left?
+## What's left?
 Among many things that can be added are:
 
 Convex shape arrays
