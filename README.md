@@ -15,7 +15,21 @@ Launch the application by running the file ```main.py```, simply by double click
 
 ### Usage
 
-![components](https://github.com/oskar-paulsson/salt/tree/master/assets/component.PNG)
+![components](https://ibb.co/5rmr80B)
+
+![img2](https://ibb.co/J76zG34)
+
+![img3](https://ibb.co/Kj3WGvs)
+
+![img4](https://ibb.co/WnQhmgT)
+
+![img5](https://ibb.co/5BWmC3T)
+
+![img6](https://ibb.co/pKHpCVD)
+
+![img7](https://ibb.co/kyHcjhG)
+
+<a href="https://imgbb.com/"><img src="https://i.ibb.co/mCM4BWy/options.png" alt="options" border="0" /></a>
 
 #### 
 ## What's left?
