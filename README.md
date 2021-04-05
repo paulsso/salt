@@ -15,38 +15,45 @@ Launch the application by running the file ```main.py```, simply by double click
 
 ### Usage
 
-Choose components:
+**Choose components:** The top component can be either an array or a transducer while the bottom component can be either an array or a reflector.
+The difference between arrays/transducers and reflectors is that they do not simulate excitation of the acoustic field.  
 
-<a href="https://ibb.co/5rmr80B"><img src="https://i.ibb.co/k4j487Q/component.png" alt="component" border="0" /></a>
+<a href="https://ibb.co/Mn6ZfW4"><img src="https://i.ibb.co/PxQFM3n/component.png" alt="component" border="0"></a>
 
-Vertical offset: 
+**Convaity:** Checked by default, if uncheck results in a flat array/transducer/reflector and thus the radius of curvature slider has no effect.
 
-<a href="https://ibb.co/dm8q8Xm"><img src="https://i.ibb.co/g4kpkQ4/vertical.png" alt="vertical" border="0" /></a>
+<a href="https://ibb.co/xhJDjbG"><img src="https://i.ibb.co/1Z8LqNK/concavity.png" alt="concavity" border="0"></a>
 
-Radius of curvature:
+**Vertical offset:** Determines the distance between the center of the array/transducer/reflector from the origin. E.g. the total distance between two arrays with this value set to 64mm on both sides is 128mm.
 
-<a href="https://ibb.co/5BWmC3T"><img src="https://i.ibb.co/hDRbrNs/roc.png" alt="roc" border="0" /></a>
+<a href="https://ibb.co/Yj4R8Jw"><img src="https://i.ibb.co/C0p1v4D/vertical.png" alt="vertical" border="0"></a>
 
-Maximum size of the socket:
+**Radius of curvature:** The radius of a sphere which the surface of the transducers will lie on.
 
-<a href="https://ibb.co/pKHpCVD"><img src="https://i.ibb.co/7p3F7Mc/socket.png" alt="socket" border="0" /></a>
+<a href="https://ibb.co/y58K8Jt"><img src="https://i.ibb.co/Xpz6zT1/roc.png" alt="roc" border="0"></a>
 
-Phase shift:
+**Maximum size of the socket:** The size of the socket determines how many rows of transducers can be put in an array, experimenting with the relation between this and radius of curvature is encouraged to understand how to define a geometry that works. 
 
-<a href="https://ibb.co/WnQhmgT"><img src="https://i.ibb.co/Zd3jqWZ/phase.png" alt="phase" border="0" /></a>
+<a href="https://ibb.co/B4V9PKL"><img src="https://i.ibb.co/XyZq4kX/socket.png" alt="socket" border="0"></a>
 
-Adjust frequency: 
+**Phase shift:** The phase component of the wave.
 
-<a href="https://ibb.co/J76zG34"><img src="https://i.ibb.co/zR9SB6Y/frequency.png" alt="frequency" border="0" /></a>
+<a href="https://ibb.co/7XjtdXQ"><img src="https://i.ibb.co/t4QpT4z/phase.png" alt="phase" border="0"></a>
 
-Configure array: 
+**Adjust frequency:** Fine tune the frequency at which you wish to excite the acoustic field.
 
-<a href="https://ibb.co/kyHcjhG"><img src="https://i.ibb.co/JdBkVzc/transducers.png" alt="transducers" border="0" /></a>
+<a href="https://ibb.co/09WVnCp"><img src="https://i.ibb.co/n1V8w7q/frequency.png" alt="frequency" border="0"></a>
 
-Options:
+**Configure array:** Almost any combination of number of rows and density on each row is available, experiment!
 
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/mCM4BWy/options.png" alt="options" border="0" /></a>
+<a href="https://ibb.co/Wx03Tzj"><img src="https://i.ibb.co/ZLSJZg7/transducers.png" alt="transducers" border="0"></a>
 
+**Options:** To familiarize oneself with how to configure the acoustic trap it is recommended to use the "display geometry" option, before running the simulation. When the simulation is run, the terminal window from where the GUI was launched will print messages on the progress of the simulation. When the simulation is done two plots will appear, one is a contour/surface plot of the acoustic radiation pressure, the other is the profile of the acoustic radiation pressure. 
+
+<a href="https://ibb.co/X3q0hFb"><img src="https://i.ibb.co/hZSQP2y/options.png" alt="options" border="0"></a>
+
+When the simulation is done three text files will be created containing comma-seperated values, one will contain the points on the contour-plot called acoustic_radiation.txt, one contains the values on the x-axis of the profile of the radiation pressure (xPlot.txt) and one profile.txt contains the values on the y-axis of the acoustic radiation profile.
+ 
 #### 
 ## What's left?
 Among many things that can be added are:
