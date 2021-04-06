@@ -59,5 +59,7 @@ When the simulation is done three text files will be created containing comma-se
 Among many things that can be added are:
 
 Convex shape arrays
+
 Square/rectangular arrays with novel arrangement patterns
+
 Mathematics coded in C for faster execution, better scaleability.
