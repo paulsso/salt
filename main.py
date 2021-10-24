@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+
 from gui import masterframe
 
-root = masterframe()
-root.setouterproperties()
-root.placemainwidgets()
-root.mainloop()
+if __name__ == "__main__":
+    root = masterframe()
+    root.setouterproperties()
+    root.placemainwidgets()
+    root.mainloop()

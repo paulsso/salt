@@ -1,18 +1,10 @@
-import tkinter as tk
 import time, sys, os
-try:
-    import numpy as np
-except:
-    os.system("pip install numpy")
-    import numpy as np
 
-try:
-    from matplotlib import pyplot as plt
-except:
-    os.system("pip install matplotlib")
-    from matplotlib import pyplot as plt
+import numpy as np
+from matplotlib import pyplot as plt
+import tkinter as tk
 
-from matrixmethod import MatrixMethod, CreateGeometry
+from MatrixMethod import MatrixMethod, CreateGeometry
 from mpl_toolkits.mplot3d import axes3d, Axes3D
 
 def definedicts(page_inst, masterframe_inst):
@@ -560,7 +552,7 @@ class masterframe(tk.Tk):
 
     def setouterproperties(self):
         self.geometry("750x850")
-        self.iconbitmap(".\icon.ico")
+        # self.iconbitmap("icon.ico")
         self.title("Simulation Platform for Acoustic Levitation Traps (SALT)")
 
     def placemainwidgets(self):
